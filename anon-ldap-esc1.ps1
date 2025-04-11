@@ -38,7 +38,7 @@ Set-ADObject -Identity "CN=Directory Service,CN=Windows NT,CN=Services,CN=Config
 # Set the ACL to allow full Read access to the "ANONYMOUS LOGON" group
 $acl = Get-Acl "AD:$DomainCN"
 $rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
-    (New-Object System.Security.Principal.NTAccount("ANONYMOUS LOGON")).Translate([System.Security.Principal.SecurityIdentifier]),
+    (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-7")).Translate([System.Security.Principal.SecurityIdentifier]),
     [System.DirectoryServices.ActiveDirectoryRights]"ReadProperty,GenericExecute",
     [System.Security.AccessControl.AccessControlType]::Allow,
     [System.DirectoryServices.ActiveDirectorySecurityInheritance]::All
@@ -54,7 +54,7 @@ Set-ItemProperty $reg "Schema Update Allowed" 1
 $conn = [ADSI]"LDAP://CN=$attrName,CN=Schema,CN=Configuration,$DomainCN"
 $conn.Put("searchFlags", 0)
 $conn.SetInfo()
-Remove-ItemProperty $reg "Schema Update Allowed" -ErrorAction SilentlyContinue
+Remove-ItemProperty $reg "Schema Update Allowed"
 
 # PATCH VULNS
 # Set MAQ to 0
