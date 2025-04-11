@@ -17,11 +17,13 @@ Import-Module ActiveDirectory
 # Add ESC1 Template
 # Source: https://github.com/GoateePFE/ADCSTemplate/blob/master/ADCSTemplate.psm1
 $TemplateName = "köttbullar"
+$str_Computer = "Dator"
+$str_DomainComputers = "Domändatorer"
 
 Install-Module -Name ADCSTemplate
-($OldTemplate = Export-ADCSTemplate -DisplayName "Computer" | ConvertFrom-Json).'msPKI-Certificate-Name-Flag' = 1
+($OldTemplate = Export-ADCSTemplate -DisplayName "$str_Computer" | ConvertFrom-Json).'msPKI-Certificate-Name-Flag' = 1
 New-ADCSTemplate -DisplayName $TemplateName -JSON ($OldTemplate | ConvertTo-Json) -Publish
-Set-ADCSTemplateACL -DisplayName $TemplateName -Type Allow -Identity 'HACK.LU\Domain Computers' -Enroll
+Set-ADCSTemplateACL -DisplayName $TemplateName -Type Allow -Identity "HACK.LU\$str_DomainComputers" -Enroll
 
 # Add computer account
 $DomainCN = "DC=hack,DC=lu"
