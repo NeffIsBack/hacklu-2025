@@ -54,10 +54,20 @@ $conn.Put("searchFlags", 0)
 $conn.SetInfo()
 Remove-ItemProperty $reg "Schema Update Allowed" -ErrorAction SilentlyContinue
 
+# PATCH VULNS
+# Set MAQ to 0
+Set-ADDomain -Identity hack.lu -Replace @{"ms-DS-MachineAccountQuota"="0"}
 
 
 
-### JUNK
+
+
+
+
+##################################
+#             JUNK               #
+##################################
+
 $schemaMaster = (Get-ADForest).SchemaMaster
 $currentHost = "$env:COMPUTERNAME.$env:USERDNSDOMAIN"
 $adminCheck = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrator")
@@ -121,9 +131,6 @@ Set-ACL -Path "AD:$ADObject" -AclObject $acl
 
 
 
-
-
-
 # Define the Distinguished Name (DN) of the Active Directory object
 $ADObject = "CN=Computers,$DomainCN"
 
@@ -161,12 +168,11 @@ $acl = $schema.psbase.ObjectSecurity
 
 # Display the ACL
 $acl | Format-List
-### JUNK
 
+##################################
+#             JUNK               #
+##################################
 
-# PATCH VULNS
-# Set MAQ to 0
-Set-ADDomain -Identity hack.lu -Replace @{"ms-DS-MachineAccountQuota"="0"}
 
 
 
