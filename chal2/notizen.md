@@ -1,3 +1,10 @@
+## Attack chain idea
+1. Null auth coercion von SRV02
+2. HTTP Relay von SRV02 zu ldap://DC01
+3. ShadowCredentials/RBCD um an SRV02$ zu kommen
+4. Mit SRV02$ local admin mit s4u2self magic
+5. DNS attack auf DC01 um shell zu bekommen
+
 ## DNS Exploit setup
 1. DNS Service auf SRV02 installieren, damit dnscmd.exe da ist
 2. Security Descriptor für DNS service aktualisieren für DNS Admins
