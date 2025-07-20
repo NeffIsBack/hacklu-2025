@@ -5,6 +5,9 @@ Rename-Computer -NewName "DC01" -Restart
 Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
 Install-ADDSForest -DomainName hack.lu
 
+# Set password never expires for the Administrator account
+Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
+
 # Set up DNS Admin for SRV02
 $DomainUser = "Øyvind Dennison"
 $DomainSAM = "Øyvind.Dennison"
