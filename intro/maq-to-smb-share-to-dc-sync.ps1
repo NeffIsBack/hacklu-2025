@@ -36,6 +36,10 @@ foreach ($tool in $tools) {
     Invoke-WebRequest -Uri $tool.Url -OutFile $outPath
 }
 
+# TODO: CHANGE IP FOR YOUR SETUP CLIENT
+# Start web server and download creds file from local server: python -m http.server 8000
+Invoke-WebRequest -Uri "http://192.168.108.128/DeployNewComputer.ps1" -OutFile "C:\IT-Deployment\DeployNewComputer.ps1"
+
 # Create a new high priv user
 $DomainUser = "Dagobert Duck"
 $DomainSAM = "Dagobert.Duck"
