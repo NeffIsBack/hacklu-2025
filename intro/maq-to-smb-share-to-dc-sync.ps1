@@ -38,7 +38,7 @@ foreach ($tool in $tools) {
 
 # TODO: CHANGE IP FOR YOUR SETUP CLIENT
 # Start web server and download creds file from local server: python -m http.server 8000
-Invoke-WebRequest -Uri "http://192.168.108.128/DeployNewComputer.ps1" -OutFile "C:\IT-Deployment\DeployNewComputer.ps1"
+Invoke-WebRequest -Uri "http://192.168.108.128:8000/DeployNewComputer.ps1" -OutFile "C:\IT-Deployment\DeployNewComputer.ps1"
 
 # Create a new high priv user
 $DomainUser = "Dagobert Duck"
