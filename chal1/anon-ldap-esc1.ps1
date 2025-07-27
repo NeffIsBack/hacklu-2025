@@ -59,6 +59,10 @@ $conn.Put("searchFlags", 0)
 $conn.SetInfo()
 Remove-ItemProperty $reg "Schema Update Allowed"
 
+# Echo Flag into Desktop/flag.txt
+$text = Read-Host "Enter Flag"
+$text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
+
 # PATCH VULNS
 # Set MAQ to 0
 Set-ADDomain -Identity hack.lu -Replace @{"ms-DS-MachineAccountQuota"="0"}

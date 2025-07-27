@@ -59,3 +59,7 @@ New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $Secure
 # Assign DC-sync rights to the high priv user
 dsacls $DomainCN /G "$DomainName\dagobert.duck:CA;Replicating Directory Changes"
 dsacls $DomainCN /G "$DomainName\dagobert.duck:CA;Replicating Directory Changes All"
+
+# Echo Flag into Desktop/flag.txt
+$text = Read-Host "Enter Flag"
+$text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
