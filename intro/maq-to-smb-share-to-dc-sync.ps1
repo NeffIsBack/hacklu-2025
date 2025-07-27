@@ -40,6 +40,14 @@ foreach ($tool in $tools) {
 # Start web server and download creds file from local server: python -m http.server 8000
 Invoke-WebRequest -Uri "http://192.168.108.128:8000/DeployNewComputer.ps1" -OutFile "C:\IT-Deployment\DeployNewComputer.ps1"
 
+# Create a new low priv user
+$LowPrivUser = "Donald Duck"
+$LowPrivSAM = "Donald.Duck"
+$LowPrivPassword = "Daisy4Ever!"
+$Description = "I may be short-tempered and unlucky, but I never give up and always give it my all!"
+$SecureLowPrivPass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
+New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecureLowPrivPass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,$DomainCN" -Description $Description
+
 # Create a new high priv user
 $DomainUser = "Dagobert Duck"
 $DomainSAM = "Dagobert.Duck"
@@ -48,10 +56,6 @@ $Description = "I am the richest duck in the world!"
 $SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
 New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,$DomainCN" -Description $Description
 
-# Create a new low priv user
-$LowPrivUser = "Donald Duck"
-$LowPrivSAM = "Donald.Duck"
-$LowPrivPassword = "Daisy4Ever!"
-$Description = "I may be short-tempered and unlucky, but I never give up and always give it my all!"
-$SecureLowPrivPass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
-New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecureLowPrivPass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,$DomainCN" -Description $Description
+# Assign DC-sync rights to the high priv user
+dsacls $DomainCN /G "$DomainName\$DomainSAM:CA;Replicating Directory Changes"
+dsacls $DomainCN /G "$DomainName\$DomainSAM:CA;Replicating Directory Changes All"
