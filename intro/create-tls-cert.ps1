@@ -51,8 +51,5 @@ Write-Host "  - PFX: $pfxPath"
 Write-Host "  - CER: $cerPath"
 
 # --- Restart NTDS to apply (or reboot) ---
-Write-Host "[*] Restarting NTDS service to activate LDAPS..."
-Restart-Service -Name NTDS -Force
-
-Write-Host "[✔] LDAPS certificate setup complete. You can test it via:"
-Write-Host "    Test-NetConnection -ComputerName localhost -Port 636"
+Write-Host "[*] Restarting to activate LDAPS..."
+Restart-Computer -Force
