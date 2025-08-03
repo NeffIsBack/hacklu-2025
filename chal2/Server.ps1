@@ -17,6 +17,5 @@ Install-WindowsFeature -Name DNS -IncludeManagementTools
 Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
 
-
 # Enforce SMB Signing
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "RequireSecuritySignature" -Value 1
