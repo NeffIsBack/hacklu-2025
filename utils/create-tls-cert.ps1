@@ -50,6 +50,14 @@ Write-Host "[*] Exported:"
 Write-Host "  - PFX: $pfxPath"
 Write-Host "  - CER: $cerPath"
 
+# --- Add the certificate to the Trusted Root Certification Authorities ---
+$rootStore = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "LocalMachine")
+$rootStore.Open("ReadWrite")
+$rootStore.Add($cert)
+$rootStore.Close()
+
+Write-Host "[+] Certificate added to Trusted Root Certification Authorities."
+
 # --- Restart NTDS to apply (or reboot) ---
 Write-Host "[*] Restarting to activate LDAPS..."
-Restart-Computer -Force
+Restart-Computer
