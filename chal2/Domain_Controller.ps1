@@ -8,13 +8,22 @@ Install-ADDSForest -DomainName hack.lu
 # Set password never expires for the Administrator account
 Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
 
+# Set up low priv user
+$LowPrivUser = "ta bort mig"
+$LowPrivSAM = "ta_bort.mig"
+$LowPrivPassword = "LjtLNg37LdcZin73"
+$LowPrivDescription = "LjtLNg37LdcZin73"
+$SecurePass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
+New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $LowPrivDescription -Path "CN=Users,DC=hack,DC=lu"
+
 # Set up DNS Admin for SRV02
 $DomainUser = "Øyvind Dennison"
 $DomainSAM = "Øyvind.Dennison"
 $DomainPassword = "Z4f8hF2t#K3HJsfGJX!&"
+# TODO: description auf Schwedisch generieren
+$DomainDescription = ""
 $SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
-New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,DC=hack,DC=lu"
-
+New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescription -Path "CN=Users,DC=hack,DC=lu"
 Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAM
 
 

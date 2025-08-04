@@ -11,7 +11,7 @@ You will often hear the term **"Domain"**. The domain is on the surface just a f
 
 A domain will have **Domain Controllers** (DCs). These are servers that host the Active Directory database and provide authentication and authorization services for users and computers in the domain. Usually a company will have at least two domain controllers for redundancy, but in this lab we will only have one domain controller.
 
-In Active Directory, there multiple different built-in groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of an security assessment is often to become Domain Admin.
+In Active Directory, there multiple different built-in groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of a security assessment is often to become a Domain Admin.
 
 ## Setup 🐧
 

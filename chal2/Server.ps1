@@ -10,12 +10,16 @@ Set-NetFirewallRule -DisplayGroup "File and Printer Sharing" -Enabled True
 
 # DNS installation
 Install-WindowsFeature -Name DNS -IncludeManagementTools
-#Set-Service -Name "DNS" -StartupType Automatic
-#Start-Service -Name "DNS"
+# WebClient installation
+Enable-WindowsOptionalFeature -Online -FeatureName "WebDAV-Redirector" -All
+Start-Service WebClient
+Set-Service WebClient -StartupType Automatic
+
+
+# Enforce SMB Signing
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "RequireSecuritySignature" -Value 1
 
 # Remove PS history
 Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
 
-# Enforce SMB Signing
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "RequireSecuritySignature" -Value 1
