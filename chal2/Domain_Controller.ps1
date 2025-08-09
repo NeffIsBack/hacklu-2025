@@ -69,5 +69,11 @@ if ($updatedValues -notcontains $newEntry) {
 # Write updated multi-string back to registry
 Set-ItemProperty -Path $regPath -Name $valueName -Value $updatedValues -Type MultiString
 
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters" `
+                 -Name "LdapEnforceChannelBinding" `
+                 -Value 0
+
 # Reboot
 Restart-Computer
+
+# GENERATE TLS CERT

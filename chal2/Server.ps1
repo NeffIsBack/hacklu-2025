@@ -1,9 +1,11 @@
 # AD Lab powershell
 Rename-Computer -NewName "SRV02" -Restart
 
+$domain = "hack.lu"
+
 # Set DC as DNS server and join to domain
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.134"
-Add-Computer -DomainName "hack.lu" -Credential (Get-Credential) -Restart
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.109.193"
+Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
 Set-NetFirewallRule -DisplayGroup "File and Printer Sharing" -Enabled True
@@ -14,6 +16,12 @@ Install-WindowsFeature -Name DNS -IncludeManagementTools
 Enable-WindowsOptionalFeature -Online -FeatureName "WebDAV-Redirector" -All
 Start-Service WebClient
 Set-Service WebClient -StartupType Automatic
+
+$sharePath = "C:\shares\EncryptedFiles"
+$description = "Denna lagringsplats är avsedd för delning av känsliga dokument. Lagra endast krypterade dokument här."
+# Create the folder if it doesn't exist and create smb share
+New-Item -Path $sharePath -ItemType Directory -Force
+New-SmbShare -Name "Krypterade filer$" -Path $sharePath -FullAccess "$domain\Domain Users" -Description $description
 
 
 # Enforce SMB Signing

