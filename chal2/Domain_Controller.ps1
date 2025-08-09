@@ -73,7 +73,20 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters"
                  -Name "LdapEnforceChannelBinding" `
                  -Value 0
 
-# Reboot
-Restart-Computer
+# Allow anonymous access to SAM accounts
+#Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" `
+#                 -Name "RestrictAnonymousSAM" -Value 0
+
+
+Import-Module ActiveDirectory
+$dn = "DC=North,DC=sevenkingdoms,DC=local"
+$sid = (New-Object System.Security.Principal.NTAccount("NT AUTHORITY\ANONYMOUS LOGON")).Translate([System.Security.Principal.SecurityIdentifier])
+$acl = Get-Acl "AD:\$dn"
+$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $sid,[System.DirectoryServices.ActiveDirectoryRights]::ReadProperty,"Allow",[System.DirectoryServices.ActiveDirectorySecurityInheritance]::All))
+Set-Acl "AD:\$dn" $acl
+
 
 # GENERATE TLS CERT
+
+# Reboot to apply all changes
+Restart-Computer
