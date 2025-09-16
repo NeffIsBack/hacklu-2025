@@ -101,3 +101,24 @@ With the commands `--users` and `--groups`, we can enumerate all users and group
 Two quick commands and we get the list of all domain users and the members of the Domain Administrators group:
 
 <img src="assets/ldap-enumeration.png" alt="LDAP Enumeration" width="1450"/>
+
+Enumerating LDAP can pose very valuable as most of the attributes in Active Directory are world readable. Not only user and group relations are available, but also information about other Active Directory services are written to LDAP. For example if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, there will be traces in LDAP.
+
+All of this functionality are LDAP queries in the background. Therefore, you can also query all attributes manually, like this:
+```bash
+nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --query "(sAMAccountName=donald.duck)" ""
+```
+
+### 4. BloodHound
+Another way to query and visualize LDAP information is BloodHound. "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems." (from the [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound)). There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
+- **SharpHound**: It is written in C# and can be executed on Windows systems. It collects a lot of different data, including user and group information, sessions, local admin rights, ACLs and much more. Also it is the most feature rich collector, as it is developed by the BloodHound team.
+- **BloodHound.py**: A Python based collector that can be executed on Linux systems. It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users, or if you don't have access to a Windows system.
+
+NetExec has integrated BloodHound.py, so you can use it to collect data and directly import it into the BloodHound web interface. The command is as follows:
+```bash
+nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --bloodhound -c all
+```
+
+This will result in a zip file which can be directly imported into the BloodHound web interface.
+
+### 5. Dumping the NTDS.dit
