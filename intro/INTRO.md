@@ -57,7 +57,7 @@ Let's use NetExec and the SMB protocol to get information the target. The basic 
 
 This already provides valuable information. We can see the build version `26100` which corresponds to either Windows 11 or Windows Server 2025. At the time of writing, this is the latest version of Windows Server. We can also see the target host name `DC01` and the domain name `hack.lu`. 
 
-❗ Before we continue, we should set add the hostname and domain name to our `/etc/hosts` file, so if later any tool tries to connect to the domain controller via hostname, it will resolve to the correct IP address❗ 
+❗ Before we continue, we should add the hostname and domain name to our `/etc/hosts` file, so if later any tool tries to connect to the domain controller via hostname, it will resolve to the correct IP address❗
 NetExec will automatically generate the entry for you with the `--generate-hosts-file` option. Run the following command to generate the hosts file and then add the line to your `/etc/hosts` file:
 ```bash
 nxc smb <ip> --generate-hosts-file
@@ -112,7 +112,7 @@ nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --query "(sAMAccountName=donald.du
 ### 4. BloodHound
 Another way to query and visualize LDAP information is BloodHound. "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems." (from the [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound)). There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
 - **SharpHound**: It is written in C# and can be executed on Windows systems. It collects a lot of different data, including user and group information, sessions, local admin rights, ACLs and much more. Also it is the most feature rich collector, as it is developed by the BloodHound team.
-- **BloodHound.py**: A Python based collector that can be executed on Linux systems. It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users, or if you don't have access to a Windows system.
+- **BloodHound.py**: A Python based collector that can be executed on Linux systems, developed by [dirk-jan](https://github.com/dirkjanm/BloodHound.py). It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users.
 
 NetExec has integrated BloodHound.py, so you can use it to collect data and directly import it into the BloodHound web interface. The command is as follows:
 ```bash
