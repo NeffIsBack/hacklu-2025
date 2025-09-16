@@ -58,6 +58,7 @@ Let's use NetExec and the SMB protocol to get information the target. The basic 
 This already provides valuable information. We can see the build version `26100` which corresponds to either Windows 11 or Windows Server 2025. At the time of writing, this is the latest version of Windows Server. We can also see the target host name `DC01` and the domain name `hack.lu`. 
 
 ❗ Before we continue, we should add the hostname and domain name to our `/etc/hosts` file, so if later any tool tries to connect to the domain controller via hostname, it will resolve to the correct IP address❗
+
 NetExec will automatically generate the entry for you with the `--generate-hosts-file` option. Run the following command to generate the hosts file and then add the line to your `/etc/hosts` file:
 ```bash
 nxc smb <ip> --generate-hosts-file
