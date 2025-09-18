@@ -50,7 +50,7 @@ New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPass
 # ============== DNS Service Configuration ==============
 # ACL to allow DNS remote control
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='DNS'"
-$sid = (New-Object System.Security.Principal.NTAccount($DomainSAM)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+$sid = (New-Object System.Security.Principal.NTAccount($DomainSAMDNS)).Translate([System.Security.Principal.SecurityIdentifier]).Value
 
 # Get current SDDL for DNS service
 $sddl = sc.exe sdshow "DNS"
@@ -89,25 +89,41 @@ if ($updatedValues -notcontains $newEntry) {
 Set-ItemProperty -Path $regPath -Name $valueName -Value $updatedValues -Type MultiString
 # ============== DNS Service Configuration ==============
 
+# ============== TODO: GENERATE TLS CERT ==============
 
+# Set LDAP channel binding to 0 (disabled) to allow LDAP relay to work
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters" `
                  -Name "LdapEnforceChannelBinding" `
                  -Value 0
 
-# Allow anonymous access to SAM accounts
-#Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" `
-#                 -Name "RestrictAnonymousSAM" -Value 0
-
-
+# ============== Allow ANONYMOUS LOGON read ==============
 Import-Module ActiveDirectory
-$dn = "DC=North,DC=sevenkingdoms,DC=local"
+$dn = "DC=hack,DC=lu"
 $sid = (New-Object System.Security.Principal.NTAccount("NT AUTHORITY\ANONYMOUS LOGON")).Translate([System.Security.Principal.SecurityIdentifier])
 $acl = Get-Acl "AD:\$dn"
-$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $sid,[System.DirectoryServices.ActiveDirectoryRights]::ReadProperty,"Allow",[System.DirectoryServices.ActiveDirectorySecurityInheritance]::All))
+
+# Define the rights for ANONYMOUS LOGON for samr enum domain users
+$rights = [System.DirectoryServices.ActiveDirectoryRights]::ReadProperty -bor [System.DirectoryServices.ActiveDirectoryRights]::GenericExecute
+$type = [System.Security.AccessControl.AccessControlType]::Allow
+$inherit = [System.DirectoryServices.ActiveDirectorySecurityInheritance]::All
+
+# Create the new Access Control Entry (ACE) with all the specified parameters.
+$ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($sid, $rights, $type, $inherit)
+
+# Add the new ACE to the domain's ACL.
+$acl.AddAccessRule($ace)
+
+# Apply the updated ACL to the domain object.
 Set-Acl "AD:\$dn" $acl
 
 
-# GENERATE TLS CERT
+# Path to LSA key
+$lsaPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+
+# Disable anonymous SAM restriction (0 = allow anonymous SAMR queries)
+Set-ItemProperty -Path $lsaPath -Name "RestrictAnonymousSAM" -Value 0 -Type DWord
+# ============== Allow ANONYMOUS LOGON read ==============
+
 
 # Reboot to apply all changes
 Restart-Computer
