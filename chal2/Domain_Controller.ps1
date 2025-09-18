@@ -12,20 +12,40 @@ Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
 $LowPrivUser = "ta bort mig"
 $LowPrivSAM = "ta_bort.mig"
 $LowPrivPassword = "LjtLNg37LdcZin73"
-$LowPrivDescription = "LjtLNg37LdcZin73"
+$LowPrivDescription = "Praktikant: Lär sig Active Directory och hämtar kaffe med samma entusiasm. LjtLNg37LdcZin73"
 $SecurePass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
 New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $LowPrivDescription -Path "CN=Users,DC=hack,DC=lu"
 
 # Set up DNS Admin for SRV02
-$DomainUser = "Øyvind Dennison"
-$DomainSAM = "Øyvind.Dennison"
-$DomainPassword = "Z4f8hF2t#K3HJsfGJX!&"
-# TODO: description auf Schwedisch generieren
-$DomainDescription = "Har fler CNAME än vänner. Sorterar sina strumpor efter färg."
-$SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
-New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescription -Path "CN=Users,DC=hack,DC=lu"
-Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAM
+$DomainUserDNS = "Øyvind Dennison"
+$DomainSAMDNS = "Øyvind.Dennison"
+$DomainPasswordDNS = "Z4f8hF2t#K3HJsfGJX!&"
+$DomainDescriptionDNS = "Har fler CNAME än vänner. Sorterar sina strumpor efter färg."
+$SecurePassDNS = ConvertTo-SecureString $DomainPasswordDNS -AsPlainText -Force
+New-ADUser -Name $DomainUserDNS -SamAccountName $DomainSAMDNS -AccountPassword $SecurePassDNS -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionDNS -Path "CN=Users,DC=hack,DC=lu"
+Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAMDNS
 
+# Set up Fluff Users
+$DomainUserFluff1 = " Freja Lund"
+$DomainSAMFluff1 = "Freja.Lund"
+$DomainPasswordFluff1 = "2r8K7gYE*%wftx"
+$DomainDescriptionFluff1 = "Dekorationsguru: Gör hyllor glada. Vattnar växter mer punktligt än cronjobs."
+$SecurePassFluff1 = ConvertTo-SecureString $DomainPasswordFluff1 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff1 -SamAccountName $DomainSAMFluff1 -AccountPassword $SecurePassFluff1 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff1 -Path "CN=Users,DC=hack,DC=lu"
+
+$DomainUserFluff2 = "Sven Andersson"
+$DomainSAMFluff2 = "Sven.Andersson"
+$DomainPasswordFluff2 = "B9!cZ4mEwP3@qy"
+$DomainDescriptionFluff2 = "Skruvkung: Monterar problem snabbare än manualen hinner öppnas."
+$SecurePassFluff2 = ConvertTo-SecureString $DomainPasswordFluff2 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff2 -SamAccountName $DomainSAMFluff2 -AccountPassword $SecurePassFluff2 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff2 -Path "CN=Users,DC=hack,DC=lu"
+
+$DomainUserFluff3 = "Björn Ek"
+$DomainSAMFluff3 = "Bjorn.Ek"
+$DomainPasswordFluff3 = "yP!6hQw9@TmE2b"
+$DomainDescriptionFluff3 = "Instruktionsartist: Ritar manualer som ingen läser men alla behöver."
+$SecurePassFluff3 = ConvertTo-SecureString $DomainPasswordFluff3 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPassword $SecurePassFluff3 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff3 -Path "CN=Users,DC=hack,DC=lu"
 
 # ============== DNS Service Configuration ==============
 # ACL to allow DNS remote control
