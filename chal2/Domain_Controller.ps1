@@ -12,7 +12,7 @@ Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
 $LowPrivUser = "ta bort mig"
 $LowPrivSAM = "ta_bort.mig"
 $LowPrivPassword = "LjtLNg37LdcZin73"
-$LowPrivDescription = "LjtLNg37LdcZin73"
+$LowPrivDescription = "Praktikant: Lär sig Active Directory och hämtar kaffe med samma entusiasm. LjtLNg37LdcZin73"
 $SecurePass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
 New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $LowPrivDescription -Path "CN=Users,DC=hack,DC=lu"
 
