@@ -21,7 +21,7 @@ $DomainUser = "Øyvind Dennison"
 $DomainSAM = "Øyvind.Dennison"
 $DomainPassword = "Z4f8hF2t#K3HJsfGJX!&"
 # TODO: description auf Schwedisch generieren
-$DomainDescription = ""
+$DomainDescription = "Har fler CNAME än vänner. Sorterar sina strumpor efter färg."
 $SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
 New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescription -Path "CN=Users,DC=hack,DC=lu"
 Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAM
@@ -53,8 +53,8 @@ $newSddl = $csd.GetSddlForm("All")
 
 # Apply updated SDDL to the service
 sc.exe sdset $service.name $newSddl
-# ============== DNS Service Configuration ==============
 
+# Set registry to allow DNS service remote access
 $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurePipeServers\SCM"
 $valueName = "RemoteAccessCheckExemptionList"
 $newEntry = "dns"
@@ -65,9 +65,10 @@ $updatedValues = @($currentValues)
 if ($updatedValues -notcontains $newEntry) {
     $updatedValues += $newEntry
 }
-
 # Write updated multi-string back to registry
 Set-ItemProperty -Path $regPath -Name $valueName -Value $updatedValues -Type MultiString
+# ============== DNS Service Configuration ==============
+
 
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters" `
                  -Name "LdapEnforceChannelBinding" `
