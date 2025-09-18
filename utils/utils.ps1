@@ -27,3 +27,7 @@ Get-ChildItem -Path $storePath | Where-Object {
         Thumbprint = $_.Thumbprint
     }
 }
+
+
+# Disable password expiration for all users
+Get-ADUser -Filter * | Set-ADUser -PasswordNeverExpires:$True
