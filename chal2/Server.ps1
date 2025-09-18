@@ -27,3 +27,17 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
 Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
 
+
+
+
+
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument 'whoami'
+$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -WeeksInterval 2 -At 3am
+$DomainUserDNS = "hack.lu\Øyvind.Dennison"
+$DomainPasswordDNS = "Z4f8hF2t#K3HJsfGJX!&"
+$SecurePassDNS = ConvertTo-SecureString $DomainPasswordDNS -AsPlainText -Force
+$principal = New-ScheduledTaskPrincipal -UserId $DomainUserDNS -LogonType Password
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable
+$task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -Settings $settings
+
+Register-ScheduledTask -TaskName "ExistentialCrisis" -InputObject $task -User $DomainUserDNS -Password $SecurePassDNS
