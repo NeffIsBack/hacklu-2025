@@ -17,15 +17,22 @@ $SecurePass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
 New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $LowPrivDescription -Path "CN=Users,DC=hack,DC=lu"
 
 # Set up DNS Admin for SRV02
-$DomainUser = "Øyvind Dennison"
-$DomainSAM = "Øyvind.Dennison"
-$DomainPassword = "Z4f8hF2t#K3HJsfGJX!&"
-# TODO: description auf Schwedisch generieren
-$DomainDescription = ""
-$SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
-New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescription -Path "CN=Users,DC=hack,DC=lu"
-Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAM
+$DomainUserDNS = "Øyvind Dennison"
+$DomainSAMDNS = "Øyvind.Dennison"
+$DomainPasswordDNS = "Z4f8hF2t#K3HJsfGJX!&"
+$DomainDescriptionDNS = "Har fler CNAME än vänner. Sorterar sina strumpor efter färg."
+$SecurePassDNS = ConvertTo-SecureString $DomainPasswordDNS -AsPlainText -Force
+New-ADUser -Name $DomainUserDNS -SamAccountName $DomainSAMDNS -AccountPassword $SecurePassDNS -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionDNS -Path "CN=Users,DC=hack,DC=lu"
+Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAMDNS
 
+# Set up Fluff Users
+$DomainUserFluff1 = " Freja Lund"
+$DomainSAMFluff1 = "Freja.Lund"
+$DomainPasswordFluff1 = "2r8K7gYE*%wftx"
+# TODO: description auf Schwedisch generieren
+$DomainDescriptionFluff1 = "Dekorationsguru: Gör hyllor glada. Vattnar växter mer punktligt än cronjobs."
+$SecurePassFluff1 = ConvertTo-SecureString $DomainPasswordFluff1 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff1 -SamAccountName $DomainSAMFluff1 -AccountPassword $SecurePassFluff1 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff1 -Path "CN=Users,DC=hack,DC=lu"
 
 # ============== DNS Service Configuration ==============
 # ACL to allow DNS remote control
