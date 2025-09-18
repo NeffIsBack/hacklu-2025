@@ -30,5 +30,5 @@ Registry key where DLL is loaded:
  * Add user to local Admins: `net localgroup Administrators Øyvind.Dennison /add`
 
 ## TODOs
-
-* Beschreibung von low priv user auf Schwedisch verfassen
+* DNSAdmin Scheduled Task mit Powershell
+* DNSAbuse testen
