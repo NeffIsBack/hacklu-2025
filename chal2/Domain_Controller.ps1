@@ -29,10 +29,23 @@ Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAMDNS
 $DomainUserFluff1 = " Freja Lund"
 $DomainSAMFluff1 = "Freja.Lund"
 $DomainPasswordFluff1 = "2r8K7gYE*%wftx"
-# TODO: description auf Schwedisch generieren
 $DomainDescriptionFluff1 = "Dekorationsguru: Gör hyllor glada. Vattnar växter mer punktligt än cronjobs."
 $SecurePassFluff1 = ConvertTo-SecureString $DomainPasswordFluff1 -AsPlainText -Force
 New-ADUser -Name $DomainUserFluff1 -SamAccountName $DomainSAMFluff1 -AccountPassword $SecurePassFluff1 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff1 -Path "CN=Users,DC=hack,DC=lu"
+
+$DomainUserFluff2 = "Sven Andersson"
+$DomainSAMFluff2 = "Sven.Andersson"
+$DomainPasswordFluff2 = "B9!cZ4mEwP3@qy"
+$DomainDescriptionFluff2 = "Skruvkung: Monterar problem snabbare än manualen hinner öppnas."
+$SecurePassFluff2 = ConvertTo-SecureString $DomainPasswordFluff2 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff2 -SamAccountName $DomainSAMFluff2 -AccountPassword $SecurePassFluff2 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff2 -Path "CN=Users,DC=hack,DC=lu"
+
+$DomainUserFluff3 = "Björn Ek"
+$DomainSAMFluff3 = "Bjorn.Ek"
+$DomainPasswordFluff3 = "yP!6hQw9@TmE2b"
+$DomainDescriptionFluff3 = "Instruktionsartist: Ritar manualer som ingen läser men alla behöver."
+$SecurePassFluff3 = ConvertTo-SecureString $DomainPasswordFluff3 -AsPlainText -Force
+New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPassword $SecurePassFluff3 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff3 -Path "CN=Users,DC=hack,DC=lu"
 
 # ============== DNS Service Configuration ==============
 # ACL to allow DNS remote control
