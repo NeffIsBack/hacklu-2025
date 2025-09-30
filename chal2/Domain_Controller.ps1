@@ -1,4 +1,6 @@
-# AD Lab powershell
+# Update System and rename computer
+Install-Module -Name PSWindowsUpdate -Force
+Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
 Rename-Computer -NewName "DC01" -Restart
 
 # Install Domain

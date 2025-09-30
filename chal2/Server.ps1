@@ -1,4 +1,6 @@
-# AD Lab powershell
+# Update System and rename computer
+Install-Module -Name PSWindowsUpdate -Force
+Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
 Rename-Computer -NewName "SRV02" -Restart
 
 # Set password never expires for the Administrator account
@@ -7,7 +9,7 @@ Set-LocalUser -Name "Administrator" -PasswordNeverExpires $True
 $domain = "hack.lu"
 
 # Set DC as DNS server and join to domain
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.145"
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.131"
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
