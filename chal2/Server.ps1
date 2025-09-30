@@ -30,14 +30,10 @@ Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_hi
 
 
 
-
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument 'whoami'
+$action  = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-NoProfile -WindowStyle Hidden -Command whoami'
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -WeeksInterval 2 -At 3am
-$DomainUserDNS = "hack.lu\Øyvind.Dennison"
-$DomainPasswordDNS = "Z4f8hF2t#K3HJsfGJX!&"
-$SecurePassDNS = ConvertTo-SecureString $DomainPasswordDNS -AsPlainText -Force
-$principal = New-ScheduledTaskPrincipal -UserId $DomainUserDNS -LogonType Password
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable
-$task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -Settings $settings
+$settings= New-ScheduledTaskSettingsSet -StartWhenAvailable
 
-Register-ScheduledTask -TaskName "ExistentialCrisis" -InputObject $task -User $DomainUserDNS -Password $SecurePassDNS
+Register-ScheduledTask -TaskName "ExistentialCrisis" `
+  -Action $action -Trigger $trigger -Settings $settings `
+  -User "hack.lu\Øyvind.Dennison" -Password "Z4f8hF2t#K3HJsfGJX!&"
