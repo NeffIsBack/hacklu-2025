@@ -46,7 +46,7 @@ Invoke-WebRequest -Uri "http://192.168.108.128:8000/DeployNewComputer.ps1" -OutF
 $LowPrivUser = "Donald Duck"
 $LowPrivSAM = "Donald.Duck"
 $LowPrivPassword = "Daisy4Ever!"
-$Description = "I may be short-tempered and unlucky, but I never give up and always give it my all!"
+$Description = "I may be short-tempered and unlucky, but I never give up and always give it my all! flag{the"
 $SecureLowPrivPass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
 New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecureLowPrivPass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,$DomainCN" -Description $Description
 

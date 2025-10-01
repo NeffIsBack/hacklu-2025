@@ -20,6 +20,8 @@ $encoded = "SV9MMHZlX00wbjN5IQ=="
 $decodedPassword = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($encoded))
 $securePassword = ConvertTo-SecureString $decodedPassword -AsPlainText -Force
 
+# Flag part 2: _hidden_domain
+
 # Build PSCredential object
 $username = "$DomainName\\dagobert.duck"
 $cred = New-Object System.Management.Automation.PSCredential ($username, $securePassword)
