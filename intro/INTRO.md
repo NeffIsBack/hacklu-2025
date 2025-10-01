@@ -110,7 +110,39 @@ All of this functionality are LDAP queries in the background. Therefore, you can
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --query "(sAMAccountName=donald.duck)" ""
 ```
 
-### 4. BloodHound
+**You should have found the first part of the flag by now.**
+
+Another very interesting attribute of the domain is the **ms-DS-MachineAccountQuota**. This attribute defines how many computer accounts a low privileged user can create in the domain. By default, this is set to 10 and means that any authenticated user can create up to 10 computer accounts in the domain. There is a separate module in NetExec to query this attribute:
+```bash
+nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M maq
+```
+
+<img src="assets/ldap-maq.png" alt="Machine Account Quota" width="1140"/>
+
+Do you remember the IT-Deployment share we found earlier? It might very well be that computer accounts have access to this share. If we can create a computer account, we might be able to access the share and find more interesting information. Creating a computer account is very easy with the `add-computer` module. We will need to provide name and a password for the new computer account. You can see all options with the `--options` option:
+```bash
+nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer --options
+nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PASSWORD="test1234"  # beautiful password, I know
+```
+<img src="assets/create-computer.png" alt="Add Computer" width="1140"/>
+
+### 4. Exploring the IT-Deployment share
+Now that we have created a computer account, we can use it to access the IT-Deployment share. Computer accounts have the `$` sign at the end of their name, so in our case the username is `NEWPC$`. At this point you could also use your file manager, but let's stick to the command line and use NetExec to explore the share. If you want to change the target share, you can use the `--share` option, which defaults to `C$`. Let's list the files in the share:
+```bash
+nxc smb <ip> -u NEWPC$ -p 'test1234' --share IT-Deployment --dir
+```
+You can download and upload files with the `--get-file`/`--put-file` option:
+```bash
+nxc smb <ip> -u NEWPC$ -p 'test1234' --share IT-Deployment --get-file "\\Path\\to\\file.txt" file.txt
+```
+
+SMB shares can be a goldmine, explore the share and see if you can find something useful.
+
+**You should have found the first part of the flag by now.**
+
+### 5. BloodHound
+You should have found new credentials now. But how can we find out what privileges these credentials have?
+
 Another way to query and visualize LDAP information is BloodHound. "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems." (from the [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound)). There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
 - **SharpHound**: It is written in C# and can be executed on Windows systems. It collects a lot of different data, including user and group information, sessions, local admin rights, ACLs and much more. Also it is the most feature rich collector, as it is developed by the BloodHound team.
 - **BloodHound.py**: A Python based collector that can be executed on Linux systems, developed by [dirk-jan](https://github.com/dirkjanm/BloodHound.py). It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users.
@@ -122,4 +154,4 @@ nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --bloodhound -c all
 
 This will result in a zip file which can be directly imported into the BloodHound web interface.
 
-### 5. Dumping the NTDS.dit
+### 6. Dumping the NTDS.dit

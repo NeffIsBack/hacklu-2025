@@ -1,3 +1,3 @@
 TODOs:
 - IP hardcoden
-- flag setzen
+- flag irgendwohin legen
