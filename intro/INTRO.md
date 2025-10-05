@@ -157,3 +157,6 @@ This will result in a zip file which can be directly imported into the BloodHoun
 There are three main views in BloodHound
 
 ### 6. Dumping the NTDS.dit
+
+
+## Other resources
