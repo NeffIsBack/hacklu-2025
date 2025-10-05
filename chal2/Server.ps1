@@ -9,25 +9,23 @@ Set-LocalUser -Name "Administrator" -PasswordNeverExpires $True
 $domain = "hack.lu"
 
 # Set DC as DNS server and join to domain
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.131"
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.144"
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
 Set-NetFirewallRule -DisplayGroup "File and Printer Sharing" -Enabled True
 
-# DNS installation
-Install-WindowsFeature -Name DNS -IncludeManagementTools
 # WebClient installation
 Enable-WindowsOptionalFeature -Online -FeatureName "WebDAV-Redirector" -All
 Start-Service WebClient
 Set-Service WebClient -StartupType Automatic
 
-# Create Scheduled Task so that the credentials of Øyvind.Dennison are in dpapi
+# Create Scheduled Task so that the credentials of maja.lindgren are in dpapi
 $action  = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-NoProfile -WindowStyle Hidden -Command whoami'
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -WeeksInterval 2 -At 3am
 $settings= New-ScheduledTaskSettingsSet -StartWhenAvailable
 
-Register-ScheduledTask -TaskName "ExistentialCrisis" -Action $action -Trigger $trigger -Settings $settings -User "hack.lu\Øyvind.Dennison" -Password "Z4f8hF2t#K3HJsfGJX!&"
+Register-ScheduledTask -TaskName "ExistentialCrisis" -Action $action -Trigger $trigger -Settings $settings -User "hack.lu\maja.lindgren" -Password "Z4f8hF2t#K3HJsfGJX!&"
 
 # Enforce SMB Signing
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "RequireSecuritySignature" -Value 1
