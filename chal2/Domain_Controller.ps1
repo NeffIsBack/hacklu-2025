@@ -5,7 +5,7 @@ Rename-Computer -NewName "DC01" -Restart
 
 # Install Domain
 Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDSForest -DomainName hack.lu
+Install-ADDSForest -DomainName "hack.lu"
 
 # Set password never expires for the Administrator account
 Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
@@ -18,17 +18,16 @@ $LowPrivDescription = "Praktikant: Lär sig Active Directory och hämtar kaffe m
 $SecurePass = ConvertTo-SecureString $LowPrivPassword -AsPlainText -Force
 New-ADUser -Name $LowPrivUser -SamAccountName $LowPrivSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $LowPrivDescription -Path "CN=Users,DC=hack,DC=lu"
 
-# Set up DNS Admin for SRV02
-$DomainUserDNS = "Øyvind Dennison"
-$DomainSAMDNS = "Øyvind.Dennison"
-$DomainPasswordDNS = "Z4f8hF2t#K3HJsfGJX!&"
-$DomainDescriptionDNS = "Har fler CNAME än vänner. Sorterar sina strumpor efter färg."
-$SecurePassDNS = ConvertTo-SecureString $DomainPasswordDNS -AsPlainText -Force
-New-ADUser -Name $DomainUserDNS -SamAccountName $DomainSAMDNS -AccountPassword $SecurePassDNS -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionDNS -Path "CN=Users,DC=hack,DC=lu"
-Add-ADGroupMember -Identity "DNSAdmins" -Members $DomainSAMDNS
+# Set up Privileged account
+$HighPrivUser = "Maja Lindgren"
+$HighPrivSAM = "maja.lindgren"
+$HighPrivPassword = "Z4f8hF2t#K3HJsfGJX!&"
+$HighPrivDescription = "Helpdesk-hjälte: Frågar alltid 'har du provat att starta om?' innan hon räddar dagen."
+$HighPrivSecurePass = ConvertTo-SecureString $HighPrivPassword -AsPlainText -Force
+New-ADUser -Name $HighPrivUser -SamAccountName $HighPrivSAM -AccountPassword $HighPrivSecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $HighPrivDescription -Path "CN=Users,DC=hack,DC=lu"
 
 # Set up Fluff Users
-$DomainUserFluff1 = " Freja Lund"
+$DomainUserFluff1 = "Freja Lund"
 $DomainSAMFluff1 = "Freja.Lund"
 $DomainPasswordFluff1 = "2r8K7gYE*%wftx"
 $DomainDescriptionFluff1 = "Dekorationsguru: Gör hyllor glada. Vattnar växter mer punktligt än cronjobs."
@@ -49,47 +48,36 @@ $DomainDescriptionFluff3 = "Instruktionsartist: Ritar manualer som ingen läser 
 $SecurePassFluff3 = ConvertTo-SecureString $DomainPasswordFluff3 -AsPlainText -Force
 New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPassword $SecurePassFluff3 -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Description $DomainDescriptionFluff3 -Path "CN=Users,DC=hack,DC=lu"
 
-# ============== DNS Service Configuration ==============
-# ACL to allow DNS remote control
-$service = Get-WmiObject -Class Win32_Service -Filter "Name='DNS'"
-$sid = (New-Object System.Security.Principal.NTAccount($DomainSAMDNS)).Translate([System.Security.Principal.SecurityIdentifier]).Value
-
-# Get current SDDL for DNS service
-$sddl = sc.exe sdshow "DNS"
-$csd = New-Object System.Security.AccessControl.CommonSecurityDescriptor $false, $false, $sddl
-
-# Define access rights: SERVICE_START (0x10), SERVICE_STOP (0x20), SERVICE_QUERY_STATUS (0x04) => 0x34
-$accessMask = 0x34
-
-# Add ACE to DACL
-$csd.DiscretionaryAcl.AddAccess(
+# ============== CONFIGURE PRIV ESC FOR HIGH PRIV USER ==============
+# Allow HighPriv user to add new members to Account Operators
+### --- 1) Allow maja.lindgren to modify Account Operators membership ---
+$UserAcct = New-Object System.Security.Principal.NTAccount("hack.lu",$HighPrivSAM)
+$group   = Get-ADGroup "Account Operators"
+$acl     = Get-Acl "AD:$($group.DistinguishedName)"
+$memberGuid = [GUID]"bf9679c0-0de6-11d0-a285-00aa003049e2"   # 'member' attribute
+$rule    = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
+    $UserAcct,
+    [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty,
     [System.Security.AccessControl.AccessControlType]::Allow,
-    $sid,
-    $accessMask,
-    [System.Security.AccessControl.InheritanceFlags]::None,
-    [System.Security.AccessControl.PropagationFlags]::None
+    $memberGuid
 )
+$acl.AddAccessRule($rule)
+Set-Acl -Path "AD:$($group.DistinguishedName)" -AclObject $acl
 
-# Convert descriptor back to SDDL
-$newSddl = $csd.GetSddlForm("All")
+### --- 2) Allow Account Operators to reset DC01 password ---
+$dc = Get-ADComputer "DC01"
+$aclDC = Get-Acl "AD:$($dc.DistinguishedName)"
+$forceChangeGuid = [GUID]"00299570-246d-11d0-a768-00aa006e0529"  # Reset/Force Change Password
 
-# Apply updated SDDL to the service
-sc.exe sdset $service.name $newSddl
-
-# Set registry to allow DNS service remote access
-$regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurePipeServers\SCM"
-$valueName = "RemoteAccessCheckExemptionList"
-$newEntry = "dns"
-
-# Get current values (if the value exists)
-$currentValues = Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction SilentlyContinue | Select-Object -ExpandProperty $valueName -ErrorAction SilentlyContinue
-$updatedValues = @($currentValues)
-if ($updatedValues -notcontains $newEntry) {
-    $updatedValues += $newEntry
-}
-# Write updated multi-string back to registry
-Set-ItemProperty -Path $regPath -Name $valueName -Value $updatedValues -Type MultiString
-# ============== DNS Service Configuration ==============
+$ruleDC = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
+    $group.SID,
+    [System.DirectoryServices.ActiveDirectoryRights]::ExtendedRight,
+    [System.Security.AccessControl.AccessControlType]::Allow,
+    $forceChangeGuid    # Remove this line and the comma at the previousline to allow full AllExtendedRights
+)
+$aclDC.AddAccessRule($ruleDC)
+Set-Acl -Path "AD:$($dc.DistinguishedName)" -AclObject $aclDC
+# ============== CONFIGURE PRIV ESC FOR HIGH PRIV USER ==============
 
 # ============== TODO: GENERATE TLS CERT ==============
 
