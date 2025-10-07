@@ -24,10 +24,10 @@ There are many many tools that are used by Penetration Testers and Red Teamers. 
 
 #### Setup on Kali
 - **NetExec**: If you are on Kali, NetExec should be preinstalled. 
-- **impacket**: To install impacket, first [install pipx](https://pipx.pypa.io/stable/installation/#on-linux) and then use pipx to isntall the impacket scripts: `pipx install git+https://github.com/fortra/impacket`
+- **impacket**: To install impacket, first [install pipx](https://pipx.pypa.io/stable/installation/#on-linux) and then use pipx to install the impacket scripts: `pipx install git+https://github.com/fortra/impacket`
 - **BloodHound**: To install Bloodhound, follow the installation instructions [here](https://www.kali.org/tools/bloodhound/). When you are done, you should be logged in to the web interface.
 
-If not, please install NetExec as described [here](https://www.netexec.wiki/getting-started/installation/installation-on-unix). Once you have installed NetExec with pipx, install impacket the same way using `pipx install git+https://github.com/fortra/impacket`. To install BloodHound please follow the instructions on the [BloodHound Wiki](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart) until you are logged in to the web interface.
+If you are not on Kali, please install NetExec as described [here](https://www.netexec.wiki/getting-started/installation/installation-on-unix). Once you have installed NetExec with pipx, install impacket the same way using `pipx install git+https://github.com/fortra/impacket`. To install BloodHound please follow the instructions on the [BloodHound Wiki](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart) until you are logged in to the web interface.
 
 #### Setup on other Linux distributions
 We will be using pipx to install NetExec and impacket. Pipx has the advantage that python tooling is available via command line, while pipx takes care of the env handling without polluting your system Python installation. Please install pipx with by following the instructions [here](https://pipx.pypa.io/stable/installation/#on-linux).
@@ -117,14 +117,14 @@ Another very interesting attribute of the domain is the **ms-DS-MachineAccountQu
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M maq
 ```
 
-<img src="assets/ldap-maq.png" alt="Machine Account Quota" width="1140"/>
+<img src="assets/ldap-maq.png" alt="Retrieve the Machine Account Quota" width="1140"/>
 
 Do you remember the IT-Deployment share we found earlier? It might very well be that computer accounts have access to this share. If we can create a computer account, we might be able to access the share and find more interesting information. Creating a computer account is very easy with the `add-computer` module. We will need to provide name and a password for the new computer account. You can see all options with the `--options` option:
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer --options
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PASSWORD="test1234"  # beautiful password, I know
 ```
-<img src="assets/create-computer.png" alt="Add Computer" width="1140"/>
+<img src="assets/create-computer.png" alt="Add a Computer Account" width="1140"/>
 
 ### 4. Exploring the IT-Deployment share
 Now that we have created a computer account, we can use it to access the IT-Deployment share. Computer accounts have the `$` sign at the end of their name, so in our case the username is `NEWPC$` (case insensitive). At this point you could also use your file manager, but let's stick to the command line and use NetExec to explore the share. If you want to change the target share, you can use the `--share` option, which defaults to `C$`. Let's list the files in the share:
@@ -170,6 +170,32 @@ Expanding this category we see that the user `dagobert.duck` has two edges to th
 **We did it**🎉 These are permissions that allow the user to replicate the domain database called NTDS.dit. This attack is called DCSync effectively letting us request the password hashes of all users in the domain, including the domain admin.
 
 ### 6. Dumping the NTDS.dit
+Although dumping the NTDS.dit is possible with NetExec, we will be using the `secretsdump.py` script from the impacket suite. Impacket has a wide variety of tools for different tasks and you should be familiar with at least the most common ones. Secretsdump also outputs all kind of different hash formats, such as AES-128 and AES-256, if needed for forging tickets. The syntax of `secretsdump.py` is as follows:
+```bash
+secretsdump.py <domain>/<username>:<password>@<ip>
+```
 
+<img src="assets/secretsdump.png" alt="Dumping the NTDS.dit" width="1140"/>
+
+Each NTDS.dit secret has the format of `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the relative identifier of the user, which is unique for each user in the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual hash of the user's password and can be used for pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
+
+### 7. Logging in as Domain Admin
+Now that we have the NT hash of the domain admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
+
+```bash
+nxc smb <ip> -u 'Administrator' -H '<NT hash>'
+```
+
+<img src="assets/pwned.png" alt="Pwned the domain" width="1140"/>
+
+Wew we did it! The "Pwned!" label indicates that we have command execution, which in most cases means we have administrative privileges to that machine. As in this case this is the domain controller, we are effectively Domain Admins now. With the `--get-file` command you can download the third part of the flag from the desktop of the domain Administrator.
+
+If you ask yourself, are these misconfigurations realistic in real world environments? The answer is yes! This is nothing I made up for this lab, I have seen all of these issues on different real engagements. Especially SMB shares can be a gold mine.
 
 ## Other resources
+If you want to learn more about Active Directory security, here are some resources and tools that I can recommend and personally use on a regular basis:
+- [The Hacker Recipes](https://www.thehacker.recipes/): Covers a lot of AD concepts and attacks, including step-by-step instructions.
+- [NetExec Wiki](https://www.netexec.wiki/): The official NetExec wiki with a lot of documentation about the tool and attacks you can perform with it.
+- [Certipy](https://github.com/ly4k/Certipy): Analyze and exploit the Active Directory Certificate Services (AD CS).
+- [Responder](https://github.com/lgandx/Responder): Poisoning tool for LLMNR, NBT-NS and MDNS to capture credentials in the network.
+- [ntlmrelayx.py](https://github.com/SecureAuthCorp/impacket/tree/master/examples/ntlmrelayx.py): The most popular tool for relaying attacks on Active Directory.
