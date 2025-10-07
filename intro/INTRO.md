@@ -11,7 +11,7 @@ You will often hear the term **"Domain"**. The domain is on the surface just a f
 
 A domain will have **Domain Controllers** (DCs). These are servers that host the Active Directory database and provide authentication and authorization services for users and computers in the domain. Usually a company will have at least two domain controllers for redundancy, but in this lab we will only have one domain controller.
 
-In Active Directory, there multiple different built-in groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of a security assessment is often to become a Domain Admin.
+In Active Directory, there multiple different pre-defined groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of a security assessment is often to become a Domain Admin.
 
 ## Setup 🐧
 
@@ -27,8 +27,6 @@ There are many many tools that are used by Penetration Testers and Red Teamers. 
 - **impacket**: To install impacket, first [install pipx](https://pipx.pypa.io/stable/installation/#on-linux) and then use pipx to install the impacket scripts: `pipx install git+https://github.com/fortra/impacket`
 - **BloodHound**: To install Bloodhound, follow the installation instructions [here](https://www.kali.org/tools/bloodhound/). When you are done, you should be logged in to the web interface.
 
-If you are not on Kali, please install NetExec as described [here](https://www.netexec.wiki/getting-started/installation/installation-on-unix). Once you have installed NetExec with pipx, install impacket the same way using `pipx install git+https://github.com/fortra/impacket`. To install BloodHound please follow the instructions on the [BloodHound Wiki](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart) until you are logged in to the web interface.
-
 #### Setup on other Linux distributions
 We will be using pipx to install NetExec and impacket. Pipx has the advantage that python tooling is available via command line, while pipx takes care of the env handling without polluting your system Python installation. Please install pipx with by following the instructions [here](https://pipx.pypa.io/stable/installation/#on-linux).
 
@@ -38,7 +36,7 @@ pipx install git+https://github.com/Pennyw0rth/NetExec
 pipx install git+https://github.com/fortra/impacket
 ```
 
-To install BloodHound please follow their installation instructions [here](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart#install-bloodhound-ce). You will need [Docker](https://docs.docker.com/engine/install/) installed, as described in step 1. Once you are logged into the web ui, you are ready to go.
+To install BloodHound please follow their installation instructions [here](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart). You will need [Docker](https://docs.docker.com/engine/install/) installed, as described in step 1. Once you are logged into the web ui, you are ready to go.
 
 # Hands-on ⌨️
 
@@ -47,15 +45,15 @@ The first thing you do is always enumerate your network. Fire up nmap and take a
 
 <img src="assets/nmap-dc-scan.png" alt="DC nmap scan" height="400"/>
 
-A domain controller typically has a lot of ports open. However, especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As also the port for Kerberos (88) and DNS (53) are open, this pretty much confirms our guess.
+A domain controller typically has a lot of ports open. Especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As also the port for Kerberos (88) and DNS (53) are open, this pretty much confirms our guess.
 
 **SMB** or **Server Message Block** is a network file sharing protocol that is not only used for file sharing, but also for RPC or command execution. This is a very important protocol in Active Directory and the primary protocol that attackers and therefore security professionals use to interact with the domain. Usually all Windows systems in the domain will have SMB enabled. **LDAP** or **Lightweight Directory Access Protocol** is in my opinion the second most important protocol for security assessments. It is a directory service hostet on domain controllers and provides information about most objects in the domain in tree based structure. This includes users, computers, groups and much more. We can use LDAP to enumerate these objects with very low privileges, as most of the information is available to all authenticated users in the domain.
 
-Let's use NetExec and the SMB protocol to get information the target. The basic syntax of NetExec (nxc in short) is `netexec <protocol> <target> <command>`. NetExec supports a lot of protocols, but we will focus on SMB and LDAP in this lab. First, just connect to the domain controller via SMB to see which information is available to us:
+Let's use NetExec and the SMB protocol to get information about the target. The basic syntax of NetExec (nxc in short) is `netexec <protocol> <target> <command>`. NetExec supports a lot of protocols, but we will focus on SMB and LDAP in this lab. First, just connect to the domain controller via SMB to see which information is available to us:
 
 <img src="assets/smb-scan.png" alt="SMB scan" width="1150"/>
 
-This already provides valuable information. We can see the build version `26100` which corresponds to either Windows 11 or Windows Server 2025. At the time of writing, this is the latest version of Windows Server. We can also see the target host name `DC01` and the domain name `hack.lu`. 
+This already provides valuable information. We can see the build version `26100` which corresponds to either Windows 11 or Windows Server 2025. At the time of writing, this is the latest version of Windows Server. We can also see the target hostname `DC01` and the domain name `hack.lu`.
 
 ❗ Before we continue, we should add the hostname and domain name to our `/etc/hosts` file, so if later any tool tries to connect to the domain controller via hostname, it will resolve to the correct IP address❗
 
@@ -68,7 +66,7 @@ If you have configured this correctly, you should be able to also use the fully 
 <img src="assets/connect-to-hack-lu.png" alt="Connect to hack.lu" width="1170"/>
 
 ### 2. Using credentials
-For this Lab, we will assume that a user has already been compromised and we have the credentials of this user. So here are the credentials for Donald Duck, who (un)fortunately clicked on your phishing link:
+For this Lab, we will assume that a user has already been compromised and we have the credentials of this user. So here are the credentials for Donald Duck, who (un)fortunately clicked on our phishing link:
 ```
 Username: donald.duck
 Password: Daisy4Ever!
@@ -94,32 +92,33 @@ And indeed, there is an interesting share called `IT-Deployment`. But first, let
 - **SYSVOL**: This share contains files that are used for domain management, such as group policies (GPOs) and logon scripts
 
 And now the interesting one:
-- **IT-Deployment**: So far we don't have READ access, but there are likely interesting files in this share. From an attacker perspective, access to this share could either have privileged groups like Domain Admins or perhaps **computer accounts** that need the access for the deployment process.
+- **IT-Deployment**: So far we don't have READ access, but there could be interesting files in this share. As the name suggests, this share may be used by the IT department to deploy software or updates to computers in the domain. Therefore, admins and possibly **computer accounts** might have access to this share.
 
 ### 3. LDAP Enumeration
-Let us get more information using the LDAP protocol. 
+Let's find out more using the LDAP protocol.
 With the commands `--users` and `--groups`, we can enumerate all users and groups in the domain. Specifying a specific group after the `--group` option will enumerate the members of that group.
-Two quick commands and we get the list of all domain users and the members of the Domain Administrators group:
+Two quick commands and we get the list of all domain users and the members of the Domain Admins group:
 
 <img src="assets/ldap-enumeration.png" alt="LDAP Enumeration" width="1450"/>
 
-Enumerating LDAP can pose very valuable as most of the attributes in Active Directory are world readable. Not only user and group relations are available, but also information about other Active Directory services are written to LDAP. For example if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, there will be traces in LDAP.
+Enumerating LDAP can be very useful, as most of the attributes in Active Directory are readable by anyone. Not only are user and group relations available, but information about other Active Directory services is also written to LDAP. For example, if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, traces will be left in LDAP.
 
-All of this functionality are LDAP queries in the background. Therefore, you can also query all attributes manually, like this:
+All of this functionality relies on LDAP queries in the background. Therefore, you can query all attributes manually as follows:
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --query "(sAMAccountName=donald.duck)" ""
 ```
 
 **You should have found the first part of the flag by now.**
 
-Another very interesting attribute of the domain is the **ms-DS-MachineAccountQuota**. This attribute defines how many computer accounts a low privileged user can create in the domain. By default, this is set to 10 and means that any authenticated user can create up to 10 computer accounts in the domain. There is a separate module in NetExec to query this attribute:
+Another very interesting attribute of the domain is the **ms-DS-MachineAccountQuota**. This attribute defines the number of computer accounts that a low-privileged user can create in the domain. By default, this value is set to 10, meaning that any authenticated user can create up to 10 computer accounts in the domain. There is a separate NetExec module to query this attribute:
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M maq
 ```
 
 <img src="assets/ldap-maq.png" alt="Retrieve the Machine Account Quota" width="1140"/>
 
-Do you remember the IT-Deployment share we found earlier? It might very well be that computer accounts have access to this share. If we can create a computer account, we might be able to access the share and find more interesting information. Creating a computer account is very easy with the `add-computer` module. We will need to provide name and a password for the new computer account. You can see all options with the `--options` option:
+Do you remember the IT-Deployment share that we found earlier? It's possible that computer accounts have access to it. If we create a computer account, we may be able to access the share and find more interesting information. Creating a computer account is very easy using the `add-computer` module. We will need to provide a name and a password for the new computer account. You can view all the options using the `--options` parameter:
+
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer --options
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PASSWORD="test1234"  # beautiful password, I know
@@ -127,10 +126,11 @@ nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PA
 <img src="assets/create-computer.png" alt="Add a Computer Account" width="1140"/>
 
 ### 4. Exploring the IT-Deployment share
-Now that we have created a computer account, we can use it to access the IT-Deployment share. Computer accounts have the `$` sign at the end of their name, so in our case the username is `NEWPC$` (case insensitive). At this point you could also use your file manager, but let's stick to the command line and use NetExec to explore the share. If you want to change the target share, you can use the `--share` option, which defaults to `C$`. Let's list the files in the share:
+Now that we have created a computer account, we can try to access the IT-Deployment share. Computer accounts have the `$` sign at the end of their name, so in our case the username is `NEWPC$` (case insensitive). At this point you could also use your file manager, but let's stick to the command line and use NetExec to explore the share. If you want to change the target share, you can use the `--share` option, which defaults to `C$`. Let's list the files in the share:
 ```bash
 nxc smb <ip> -u NEWPC$ -p 'test1234' --share IT-Deployment --dir
 ```
+And we indeed have access to the share! Let's take a look at the files in this share.
 You can download and upload files with the `--get-file`/`--put-file` option:
 ```bash
 nxc smb <ip> -u NEWPC$ -p 'test1234' --share IT-Deployment --get-file "\\Path\\to\\file.txt" file.txt
@@ -144,40 +144,40 @@ SMB shares can be a goldmine, explore the share and see if you can find somethin
 Obtaining new credentials is neat, but did we actually gain any additional privileges? How can we find out what privileges these credentials have? Here comes BloodHound into play.
 
 #### Gathering data for BloodHound
-Another way to query and visualize LDAP information is BloodHound. "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems." (from the [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound)). There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
-- **SharpHound**: It is written in C# and can be executed on Windows systems. It collects a lot of different data, including user and group information, sessions, local admin rights, ACLs and much more. Also it is the most feature rich collector, as it is developed by the BloodHound team.
-- **BloodHound.py**: A Python based collector that can be executed on Linux systems, developed by [dirk-jan](https://github.com/dirkjanm/BloodHound.py). It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users.
+Another way to query and visualize LDAP information is BloodHound. The [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound) states: "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems.". There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
+- [**SharpHound**](https://github.com/SpecterOps/SharpHound): It is written in C# and can be executed on Windows systems. It collects a lot of different data, including user and group information, sessions, local admin rights, ACLs and much more. Also it is the most feature rich collector, as it is developed by the BloodHound team.
+- [**BloodHound.py**](https://github.com/dirkjanm/BloodHound.py): A Python based collector that can be executed on Linux systems, developed by [dirk-jan](https://x.com/_dirkjan). It implements most of the functionality of SharpHound and is usually the preferred choice for Linux users.
 
-NetExec has integrated BloodHound.py, so you can use it to collect data and directly import it into the BloodHound web interface. As this is a lab environment without proper DNS resolution and we are calling an external tool, we should provide the dns server which BloodHound.py should use to resolve the domain controller hostname. This can be done with the `--dns-server` option:
+NetExec has integrated the BloodHound.py collector, enabling you to collect and directly import data into the BloodHound web interface. As this is a lab environment without proper DNS resolution, and as we are calling an external tool, we should specify the DNS server that BloodHound.py should use to resolve the domain controllers hostname. This can be done using the `--dns-server` option:
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --bloodhound -c all --dns-server <ip>
 ```
 
-This will result in a zip file which can be directly imported into the BloodHound web interface. If you are on kali and you have done the setup just type `bloodhound` in your terminal to open the web interface. After logging in, you will be prompted with a file upload dialog, as the database is empty at the moment. Upload the zip file that was generated by NetExec and wait until the import is finished.
+This will result in a ZIP file that can be imported directly into the BloodHound web interface. If you are on Kali and have completed the setup, simply type 'bloodhound' in your terminal to open the web interface. After logging in, you will be prompted to upload a file, as the database is currently empty. Upload the ZIP file generated by NetExec and wait for the import to finish.
 
 #### Analyzing privileges
 There are three main ways to query the data in BloodHound:
-- The first one is a simple search where you can search for nodes by name. These can be users, groups, computers or other active directory objects.
-- The second way is the path finding search, where you can find paths between two nodes. With this you can check if the starting node has some form of privileged control over the target node.
-- The third way is the pre-defined queries. These are queries that are already defined in BloodHound and can be executed with a single click. They include queries for finding all Domain Admins, all users with local admin rights on a specific computer or all computers that have unconstrained delegation enabled.
+- The first one is a simple search, which allows you to search for nodes by name. These can be users, groups, computers or other Active Directory objects.
+- The second way is the path finding search, with which you can find paths between two nodes. This allows you to check whether the starting node has some form of privileged control over the target node.
+- The third way is to use pre-defined queries. These are queries that are already defined in BloodHound and can be executed with a single click. For example, they include queries to find all Domain Admins, all users with local admin privileges on a specific computer or all computers with unconstrained delegation enabled.
 
-Let's start with searching our user `dagobert.duck`. When clicking on a node on the right side you will see all properties of this node. There are many interesting properties, for example the `description`, the `LastLogon` timestamp or the `pwdLastSet` timestamp. The most interesting information is however the "Outbound Object Control". This shows all objects that our user has some form of control over.
+Let's start by querying our user `dagobert.duck`. Clicking on a node on the right will display all of its properties. There are many interesting properties: the `description`, the `LastLogon` timestamp and the `pwdLastSet` timestamp, for example. However, the most interesting information is the "Outbound Object Control". This shows all the objects that our user has some form of control over.
 
 Expanding this category we see that the user `dagobert.duck` has two edges to the domain object:
 - GetChanges
 - GetChangesAll
 
-**We did it**🎉 These are permissions that allow the user to replicate the domain database called NTDS.dit. This attack is called DCSync effectively letting us request the password hashes of all users in the domain, including the domain admin.
+**We did it**🎉 These are the permissions that allow the user to replicate the domain database called NTDS.dit. This attack is called DCSync, and it effectively lets us request the password hashes of all users in the domain, including the domain admin.
 
 ### 6. Dumping the NTDS.dit
-Although dumping the NTDS.dit is possible with NetExec, we will be using the `secretsdump.py` script from the impacket suite. Impacket has a wide variety of tools for different tasks and you should be familiar with at least the most common ones. Secretsdump also outputs all kind of different hash formats, such as AES-128 and AES-256, if needed for forging tickets. The syntax of `secretsdump.py` is as follows:
+Although it is possible to dump the NTDS.dit with NetExec, we will be using the `secretsdump.py` script from the Impacket suite. Impacket offers a wide range of tools for various tasks, and it is advisable to be familiar with the most commonly used ones. The `secretsdump.py` script outputs various hash formats, such as AES-128 and AES-256, which can be used for forging tickets if needed. The syntax of `secretsdump.py` is as follows:
 ```bash
 secretsdump.py <domain>/<username>:<password>@<ip>
 ```
 
 <img src="assets/secretsdump.png" alt="Dumping the NTDS.dit" width="1140"/>
 
-Each NTDS.dit secret has the format of `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the relative identifier of the user, which is unique for each user in the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual hash of the user's password and can be used for pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
+The format of each NTDS.dit secret is `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the user's unique relative identifier within the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual password hash and can be used in pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
 
 ### 7. Logging in as Domain Admin
 Now that we have the NT hash of the domain admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
@@ -188,7 +188,7 @@ nxc smb <ip> -u 'Administrator' -H '<NT hash>'
 
 <img src="assets/pwned.png" alt="Pwned the domain" width="1140"/>
 
-Wew we did it! The "Pwned!" label indicates that we have command execution, which in most cases means we have administrative privileges to that machine. As in this case this is the domain controller, we are effectively Domain Admins now. With the `--get-file` command you can download the third part of the flag from the desktop of the domain Administrator.
+Wew we did it! The "Pwned!" label indicates that we have command execution, which usually indicates that we have administrative privileges for that machine. As this is the domain controller in this case, we are effectively Domain Admins now. With the `--get-file` command you can download the third part of the flag from the desktop of the domain Administrator.
 
 If you ask yourself, are these misconfigurations realistic in real world environments? The answer is yes! This is nothing I made up for this lab, I have seen all of these issues on different real engagements. Especially SMB shares can be a gold mine.
 
