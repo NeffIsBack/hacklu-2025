@@ -18,7 +18,7 @@ New-Item -ItemType Directory -Path "C:\IT-Deployment" -Force
 $Parameters = @{
     Name = 'IT-Deployment'
     Path = 'C:\IT-Deployment'
-    ReadAccess = "$DomainName\Domain Computers"
+    ReadAccess = "$DomainName\Domändatorer"     # CAREFUL, CHANGED FOR SWEDISH IMAGE: "Domain Computers" in Swedish
     FullAccess = "$DomainName\Administrator"
 }
 New-SmbShare @Parameters
