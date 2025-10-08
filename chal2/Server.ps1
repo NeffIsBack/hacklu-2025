@@ -8,8 +8,8 @@ Set-LocalUser -Name "Administrator" -PasswordNeverExpires $True
 
 $domain = "hack.lu"
 
-# Set DC as DNS server and join to domain
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.144"
+# Set DC as DNS server and join to domain for setup
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.140"   # TODO: CHANGE IP FOR YOUR SETUP DC
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
@@ -34,4 +34,5 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
 Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
 # Set IP and Gateway
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "10.244.0.11"
 New-NetIPAddress -IPAddress "10.244.0.11" -PrefixLength 0 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet0"
