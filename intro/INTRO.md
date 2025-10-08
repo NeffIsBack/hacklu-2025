@@ -1,6 +1,6 @@
 # The world of Active Directory
 
-If you have no idea what Active Directory is or how it works? Are you eager to learn how to compromise an Active Directory environment? Then you are in the right place!
+You have no idea what Active Directory is or how it works? Are you eager to learn how to compromise an Active Directory environment? Then you are in the right place!
 
 ## Introduction
 First we need to clarify a few terms that are used in the world of Active Directory.
@@ -11,11 +11,11 @@ You will often hear the term **"Domain"**. The domain is on the surface just a f
 
 A domain will have **Domain Controllers** (DCs). These are servers that host the Active Directory database and provide authentication and authorization services for users and computers in the domain. Usually a company will have at least two domain controllers for redundancy, but in this lab we will only have one domain controller.
 
-In Active Directory, there multiple different pre-defined groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of a security assessment is often to become a Domain Admin.
+In Active Directory, there are multiple different pre-defined groups. A very important group for an attacker is the **Domain Admins** group. Members of this group have full control over the domain and can perform (nearly) any action in the Active Directory environment. Therefore, the goal of a security assessment is often to become a Domain Admin.
 
 ## Setup 🐧
 
-There are many many tools that are used by Penetration Testers and Red Teamers. In this Introduction you will get to know in particular the following tools:
+There are a variety of tools that are used by Penetration Testers and Red Teamers. In this Introduction in particular you will get to know the following tools:
 - **NetExec**: A tool that allows you to enumerate the network, execute commands on remote systems and harvest credentials.
 - **impacket**: A collection of Python classes for working with network protocols with a huge set of examples for various tasks.
 - **BloodHound**: A tool that allows you to visualize potential attack paths in an Active Directory environment.
@@ -41,13 +41,13 @@ To install BloodHound please follow their installation instructions [here](https
 # Hands-on ⌨️
 
 ### 1. Enumeration 🔍
-The first thing you do is always enumerate your network. Fire up nmap and take a look at the Domain Controller:
+The first thing you always do is enumerate your network. Fire up nmap and take a look at the Domain Controller:
 
 <img src="assets/nmap-dc-scan.png" alt="DC nmap scan" height="400"/>
 
-A domain controller typically has a lot of ports open. Especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As also the port for Kerberos (88) and DNS (53) are open, this pretty much confirms our guess.
+A domain controller typically has multiple ports open. Especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As the port for Kerberos (88) and DNS (53) are open as well, this pretty much confirms our guess.
 
-**SMB** or **Server Message Block** is a network file sharing protocol that is not only used for file sharing, but also for RPC or command execution. This is a very important protocol in Active Directory and the primary protocol that attackers and therefore security professionals use to interact with the domain. Usually all Windows systems in the domain will have SMB enabled. **LDAP** or **Lightweight Directory Access Protocol** is in my opinion the second most important protocol for security assessments. It is a directory service hostet on domain controllers and provides information about most objects in the domain in tree based structure. This includes users, computers, groups and much more. We can use LDAP to enumerate these objects with very low privileges, as most of the information is available to all authenticated users in the domain.
+**SMB** or **Server Message Block** is a network file sharing protocol that is not only used for file sharing, but also for RPC and command execution. This is a very important protocol in Active Directory and the primary protocol that attackers and security professionals use to interact with the domain. The majority of Windows systems in the domain will have SMB enabled. **LDAP** or **Lightweight Directory Access Protocol** arguably the second most important protocol for security assessments. It is a directory service hosted on domain controllers and provides information about most objects in the domain in a tree based structure. This includes users, computers, groups and much more. We can use LDAP to enumerate these objects with very low privileges, as most of the information is available to all authenticated users in the domain.
 
 Let's use NetExec and the SMB protocol to get information about the target. The basic syntax of NetExec (nxc in short) is `netexec <protocol> <target> <command>`. NetExec supports a lot of protocols, but we will focus on SMB and LDAP in this lab. First, just connect to the domain controller via SMB to see which information is available to us:
 
@@ -61,7 +61,7 @@ NetExec will automatically generate the entry for you with the `--generate-hosts
 ```bash
 nxc smb <ip> --generate-hosts-file
 ```
-If you have configured this correctly, you should be able to also use the fully qualified domain name (FQDN) `dc01.hack.lu` to connect to the domain controller:
+If you have configured this correctly, you should be able to use the fully qualified domain name (FQDN) `dc01.hack.lu` to connect to the domain controller:
 
 <img src="assets/connect-to-hack-lu.png" alt="Connect to hack.lu" width="1170"/>
 
@@ -101,7 +101,7 @@ Two quick commands and we get the list of all domain users and the members of th
 
 <img src="assets/ldap-enumeration.png" alt="LDAP Enumeration" width="1450"/>
 
-Enumerating LDAP can be very useful, as most of the attributes in Active Directory are readable by anyone. Not only are user and group relations available, but information about other Active Directory services is also written to LDAP. For example, if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, traces will be left in LDAP.
+Enumerating LDAP can be very useful, as most of the attributes in Active Directory are readable by anyone. Not only user and group relations are available, but information about other Active Directory services is also written to LDAP. For example, if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, traces will be left in LDAP.
 
 All of this functionality relies on LDAP queries in the background. Therefore, you can query all attributes manually as follows:
 ```bash
@@ -110,7 +110,7 @@ nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' --query "(sAMAccountName=donald.du
 
 **You should have found the first part of the flag by now.**
 
-Another very interesting attribute of the domain is the **ms-DS-MachineAccountQuota**. This attribute defines the number of computer accounts that a low-privileged user can create in the domain. By default, this value is set to 10, meaning that any authenticated user can create up to 10 computer accounts in the domain. There is a separate NetExec module to query this attribute:
+Another very interesting attribute of the domain is the **ms-DS-MachineAccountQuota**. This attribute defines the number of computer accounts that a low-privileged user can create in the domain. By **default**, this value is set to 10, meaning that any authenticated user can create up to 10 computer accounts in the domain. There is a separate NetExec module to query this attribute:
 ```bash
 nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M maq
 ```
@@ -141,7 +141,7 @@ SMB shares can be a goldmine, explore the share and see if you can find somethin
 **You should have found the second part of the flag by now.**
 
 ### 5. BloodHound
-Obtaining new credentials is neat, but did we actually gain any additional privileges? How can we find out what privileges these credentials have? Here comes BloodHound into play.
+Obtaining new credentials is neat, but did we actually gain any additional privileges? How can we find out what privileges these credentials have? This is where BloodHound comes into play.
 
 #### Gathering data for BloodHound
 Another way to query and visualize LDAP information is BloodHound. The [BloodHound GitHub README](https://github.com/SpecterOps/BloodHound) states: "BloodHound leverages graph theory to reveal hidden and often unintended relationships across identity and access management systems.". There are multiple different "collectors" with which you can collect BloodHound data. The most common two are:
@@ -167,7 +167,7 @@ Expanding this category we see that the user `dagobert.duck` has two edges to th
 - GetChanges
 - GetChangesAll
 
-**We did it**🎉 These are the permissions that allow the user to replicate the domain database called NTDS.dit. This attack is called DCSync, and it effectively lets us request the password hashes of all users in the domain, including the domain admin.
+**We did it**🎉 These are the permissions that allow the user to replicate the domain database called NTDS.dit. This attack is called DCSync, and it effectively lets us request the password hashes of all users in the domain, including the Domain Admin.
 
 ### 6. Dumping the NTDS.dit
 Although it is possible to dump the NTDS.dit with NetExec, we will be using the `secretsdump.py` script from the Impacket suite. Impacket offers a wide range of tools for various tasks, and it is advisable to be familiar with the most commonly used ones. The `secretsdump.py` script outputs various hash formats, such as AES-128 and AES-256, which can be used for forging tickets if needed. The syntax of `secretsdump.py` is as follows:
@@ -180,7 +180,7 @@ secretsdump.py <domain>/<username>:<password>@<ip>
 The format of each NTDS.dit secret is `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the user's unique relative identifier within the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual password hash and can be used in pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
 
 ### 7. Logging in as Domain Admin
-Now that we have the NT hash of the domain admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
+Now that we have the NT hash of the Domain Admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
 
 ```bash
 nxc smb <ip> -u 'Administrator' -H '<NT hash>'
@@ -188,7 +188,7 @@ nxc smb <ip> -u 'Administrator' -H '<NT hash>'
 
 <img src="assets/pwned.png" alt="Pwned the domain" width="1140"/>
 
-Wew we did it! The "Pwned!" label indicates that we have command execution, which usually indicates that we have administrative privileges for that machine. As this is the domain controller in this case, we are effectively Domain Admins now. With the `--get-file` command you can download the third part of the flag from the desktop of the domain Administrator.
+Wew we did it! The "Pwned!" label indicates that we have command execution, which usually indicates that we have administrative privileges for that machine. As this is the domain controller in this case, we are effectively Domain Admins now. With the `--get-file` command you can download the third part of the flag from the desktop of the Domain Administrator.
 
 If you ask yourself, are these misconfigurations realistic in real world environments? The answer is yes! This is nothing I made up for this lab, I have seen all of these issues on different real engagements. Especially SMB shares can be a gold mine.
 
