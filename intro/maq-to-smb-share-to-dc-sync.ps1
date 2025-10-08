@@ -58,6 +58,8 @@ $Description = "I am the richest duck in the world!"
 $SecurePass = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
 New-ADUser -Name $DomainUser -SamAccountName $DomainSAM -AccountPassword $SecurePass -Enabled $true -PasswordNeverExpires $true -ChangePasswordAtLogon $false -Path "CN=Users,$DomainCN" -Description $Description
 
+# TODO: CONFIGURE TLS CERT FOR BLOODHOUND
+
 # Assign DC-sync rights to the high priv user
 dsacls $DomainCN /G "$DomainName\dagobert.duck:CA;Replicating Directory Changes"
 dsacls $DomainCN /G "$DomainName\dagobert.duck:CA;Replicating Directory Changes All"
