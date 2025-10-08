@@ -5,7 +5,7 @@ Rename-Computer -NewName "DC01" -Restart
 
 # Install Domain
 Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-ADDSForest -DomainName hack.lu
+Install-ADDSForest -DomainName "hack.lu"
 
 # Set password never expires for the Administrator account
 Set-ADUser -Identity "Administrator" -PasswordNeverExpires $true
