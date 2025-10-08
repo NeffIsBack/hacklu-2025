@@ -117,3 +117,10 @@ Set-ItemProperty -Path $lsaPath -Name "RestrictAnonymousSAM" -Value 0 -Type DWor
 
 # Reboot to apply all changes
 Restart-Computer
+
+# Echo Flag into Desktop/flag.txt
+$text = Read-Host "Enter Flag"
+$text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
+
+# Set IP and Gateway
+New-NetIPAddress -IPAddress "192.168.1.100" -PrefixLength 24 -DefaultGateway "192.168.1.1" -InterfaceAlias "Ethernet"

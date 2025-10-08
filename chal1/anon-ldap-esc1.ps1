@@ -61,18 +61,16 @@ $conn.Put("searchFlags", 0)
 $conn.SetInfo()
 Remove-ItemProperty $reg "Schema Update Allowed"
 
-# Echo Flag into Desktop/flag.txt
-$text = Read-Host "Enter Flag"
-$text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
-
 # PATCH VULNS
 # Set MAQ to 0
 Set-ADDomain -Identity hack.lu -Replace @{"ms-DS-MachineAccountQuota"="0"}
 
+# Echo Flag into Desktop/flag.txt
+$text = Read-Host "Enter Flag"
+$text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
 
-
-
-
+# Set IP and Gateway
+New-NetIPAddress -IPAddress "192.168.1.100" -PrefixLength 24 -DefaultGateway "192.168.1.1" -InterfaceAlias "Ethernet"
 
 
 ##################################
