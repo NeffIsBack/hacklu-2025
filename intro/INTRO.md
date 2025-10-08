@@ -45,7 +45,7 @@ The first thing you always do is enumerate your network. Fire up nmap and take a
 
 <img src="assets/nmap-dc-scan.png" alt="DC nmap scan" height="400"/>
 
-A domain controller typically has multiple ports open. Especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As the port for Kerberos (88) and DNS (53) are open aswell, this pretty much confirms our guess.
+A domain controller typically has multiple ports open. Especially the SMB port (445), LDAP port (389) and LDAPS port (636) are a good indicator that this is a domain controller. As the port for Kerberos (88) and DNS (53) are open as well, this pretty much confirms our guess.
 
 **SMB** or **Server Message Block** is a network file sharing protocol that is not only used for file sharing, but also for RPC and command execution. This is a very important protocol in Active Directory and the primary protocol that attackers and security professionals use to interact with the domain. The majority of Windows systems in the domain will have SMB enabled. **LDAP** or **Lightweight Directory Access Protocol** arguably the second most important protocol for security assessments. It is a directory service hosted on domain controllers and provides information about most objects in the domain in a tree based structure. This includes users, computers, groups and much more. We can use LDAP to enumerate these objects with very low privileges, as most of the information is available to all authenticated users in the domain.
 
@@ -101,7 +101,7 @@ Two quick commands and we get the list of all domain users and the members of th
 
 <img src="assets/ldap-enumeration.png" alt="LDAP Enumeration" width="1450"/>
 
-Enumerating LDAP can be very useful, as most of the attributes in Active Directory are readable by anyone. Not only user and group relations are available, but informations about other Active Directory services are also written to LDAP. For example, if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, traces will be left in LDAP.
+Enumerating LDAP can be very useful, as most of the attributes in Active Directory are readable by anyone. Not only user and group relations are available, but information about other Active Directory services is also written to LDAP. For example, if Active Directory Certificate Services (AD CS) or Microsoft Endpoint Configuration Manager (MECM, formerly SCCM) are deployed, traces will be left in LDAP.
 
 All of this functionality relies on LDAP queries in the background. Therefore, you can query all attributes manually as follows:
 ```bash
@@ -180,7 +180,7 @@ secretsdump.py <domain>/<username>:<password>@<ip>
 The format of each NTDS.dit secret is `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the user's unique relative identifier within the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual password hash and can be used in pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
 
 ### 7. Logging in as Domain Admin
-Now that we have the NT hash of the domain admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
+Now that we have the NT hash of the Domain Admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
 
 ```bash
 nxc smb <ip> -u 'Administrator' -H '<NT hash>'
