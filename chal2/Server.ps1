@@ -4,7 +4,7 @@ Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
 Rename-Computer -NewName "SRV02" -Restart
 
 # Set password never expires for the Administrator account
-Set-LocalUser -Name "Administrator" -PasswordNeverExpires $True
+Set-LocalUser -Name "Administratör" -PasswordNeverExpires $True     # CAREFUL, CHANGED FOR SWEDISH IMAGE: "Administrator" in Swedish
 
 $domain = "hack.lu"
 
@@ -13,7 +13,7 @@ Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
-Set-NetFirewallRule -DisplayGroup "File and Printer Sharing" -Enabled True
+Set-NetFirewallRule -DisplayGroup "Fil- och skrivardelning" -Enabled True   # CAREFUL, CHANGED FOR SWEDISH IMAGE: "File and Printer Sharing" in Swedish
 
 # WebClient installation
 Enable-WindowsOptionalFeature -Online -FeatureName "WebDAV-Redirector" -All

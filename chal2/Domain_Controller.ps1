@@ -52,7 +52,7 @@ New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPass
 # Allow HighPriv user to add new members to Account Operators
 ### --- 1) Allow maja.lindgren to modify Account Operators membership ---
 $UserAcct = New-Object System.Security.Principal.NTAccount("hack.lu",$HighPrivSAM)
-$group   = Get-ADGroup "Account Operators"
+$group   = Get-ADGroup "Kontoansvariga"     # CAREFUL, CHANGED FOR SWEDISH IMAGE: "Account Operators" in Swedish
 $acl     = Get-Acl "AD:$($group.DistinguishedName)"
 $memberGuid = [GUID]"bf9679c0-0de6-11d0-a285-00aa003049e2"   # 'member' attribute
 $rule    = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
@@ -72,8 +72,8 @@ $forceChangeGuid = [GUID]"00299570-246d-11d0-a768-00aa006e0529"  # Reset/Force C
 $ruleDC = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
     $group.SID,
     [System.DirectoryServices.ActiveDirectoryRights]::ExtendedRight,
-    [System.Security.AccessControl.AccessControlType]::Allow,
-    $forceChangeGuid    # Remove this line and the comma at the previousline to allow full AllExtendedRights
+    [System.Security.AccessControl.AccessControlType]::Allow#,
+    #$forceChangeGuid    # Uncomment this line and the comma at the previousline to allow only ForceChangePassword instead of full AllExtendedRights
 )
 $aclDC.AddAccessRule($ruleDC)
 Set-Acl -Path "AD:$($dc.DistinguishedName)" -AclObject $aclDC
@@ -89,7 +89,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters"
 # ============== Allow ANONYMOUS LOGON read ==============
 Import-Module ActiveDirectory
 $dn = "DC=hack,DC=lu"
-$sid = (New-Object System.Security.Principal.NTAccount("NT AUTHORITY\ANONYMOUS LOGON")).Translate([System.Security.Principal.SecurityIdentifier])
+$sid = New-Object System.Security.Principal.SecurityIdentifier("S-1-5-7")
 $acl = Get-Acl "AD:\$dn"
 
 # Define the rights for ANONYMOUS LOGON for samr enum domain users
