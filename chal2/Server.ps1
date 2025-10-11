@@ -35,4 +35,4 @@ Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_hi
 
 # Set IP and Gateway
 Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "10.244.0.10"
-New-NetIPAddress -IPAddress "10.244.0.11" -PrefixLength 0 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet0"
+New-NetIPAddress -IPAddress "10.244.0.11" -PrefixLength 32 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet0"
