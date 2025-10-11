@@ -11,3 +11,7 @@
 
 ### Befehle
  * Add DNS entry: `python dnstool.py -u hack.lu\\ta_bort.mig -p 'LjtLNg37LdcZin73' ldaps://192.168.108.134 -port 636 -a add -r kali --data 192.168.108.128 -dns-ip 192.168.108.134`
+
+
+# Description
+The instances might take a minute or two to spin up, so please be patient.
