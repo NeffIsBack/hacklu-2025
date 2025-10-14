@@ -14,4 +14,4 @@
 
 
 # Description
-The instances might take a minute or two to spin up, so please be patient.
+Please give the machines a couple of minutes to actually boot. `srv` can take up to five minutes to be ready, `dc` should be significantly faster.
