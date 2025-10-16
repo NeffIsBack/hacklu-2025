@@ -1,6 +1,6 @@
 # Update System and rename computer
 Install-Module -Name PSWindowsUpdate -Force
-Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
+Install-WindowsUpdate -MicrosoftUpdate -AcceptAll
 Rename-Computer -NewName "SRV02" -Restart
 
 # Set password never expires for the Administrator account
@@ -9,7 +9,7 @@ Set-LocalUser -Name "Administratör" -PasswordNeverExpires $True     # CAREFUL, 
 $domain = "hack.lu"
 
 # Set DC as DNS server and join to domain for setup
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "10.244.0.10"   # TODO: CHANGE IP FOR YOUR SETUP DC
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.134"   # TODO: CHANGE IP FOR YOUR SETUP DC
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
@@ -34,5 +34,5 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
 Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
 # Set IP and Gateway
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "10.244.0.10"
-New-NetIPAddress -IPAddress "10.244.0.11" -PrefixLength 32 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet0"
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses "10.244.0.10"
+Set-NetIPAddress -IPAddress "10.244.0.11" -PrefixLength 32 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet"
