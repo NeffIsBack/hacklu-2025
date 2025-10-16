@@ -9,7 +9,7 @@ Set-LocalUser -Name "Administratör" -PasswordNeverExpires $True     # CAREFUL, 
 $domain = "hack.lu"
 
 # Set DC as DNS server and join to domain for setup
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "192.168.108.140"   # TODO: CHANGE IP FOR YOUR SETUP DC
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses "10.244.0.10"   # TODO: CHANGE IP FOR YOUR SETUP DC
 Add-Computer -DomainName $domain -Credential (Get-Credential) -Restart
 
 # Allow SMB in firewall
