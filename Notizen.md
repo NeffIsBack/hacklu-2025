@@ -1,5 +1,6 @@
 TODOs:
-- IP hardcoden
+- vmware drivers deinstallieren
+- IP hardcoden (MUSS hlt NOCHMAL MACHEN)
 - flag irgendwohin legen
 
 ```powershell
