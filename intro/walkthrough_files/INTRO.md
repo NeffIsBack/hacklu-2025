@@ -120,8 +120,8 @@ nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M maq
 Do you remember the IT-Deployment share that we found earlier? It's possible that computer accounts have access to it. If we create a computer account, we may be able to access the share and find more interesting information. Creating a computer account is very easy using the `add-computer` module. We will need to provide a name and a password for the new computer account. You can view all the options using the `--options` parameter:
 
 ```bash
-nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer --options
-nxc ldap <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PASSWORD="test1234"  # beautiful password, I know
+nxc smb <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer --options
+nxc smb <ip> -u donald.duck -p 'Daisy4Ever!' -M add-computer -o NAME="NEWPC" PASSWORD="test1234"  # beautiful password, I know
 ```
 <img src="assets/create-computer.png" alt="Add a Computer Account" width="1140"/>
 
