@@ -70,4 +70,4 @@ $text = Read-Host "Enter Flag"
 $text | Out-File -FilePath "$env:USERPROFILE\Desktop\flag.txt"
 
 # Set IP and Gateway
-Set-NetIPAddress -IPAddress "10.244.0.10" -PrefixLength 32 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet"
+New-NetIPAddress -IPAddress "10.244.0.10" -PrefixLength 32 -DefaultGateway "10.244.1.2" -InterfaceAlias "Ethernet"
