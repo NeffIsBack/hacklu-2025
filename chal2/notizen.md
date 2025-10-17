@@ -16,7 +16,7 @@
 # Description
 Please give the machines a couple of minutes to actually boot. `srv` can take up to five minutes to be ready, `dc` should be significantly faster.
 
-The Flag is located in `C:\Users\Administratör\Desktop\flag.txt` on the DC01 machine.
+The Flag is located in `C:\Users\Administratör\Desktop\flag.txt` on the DC01 machine.\
 ❗Don't forget to set up your `/etc/hosts` file to resolve the domain names correctly!❗
 
 teaser:The setup is more complicated than the challenge itself
