@@ -51,18 +51,21 @@ New-ADUser -Name $DomainUserFluff3 -SamAccountName $DomainSAMFluff3 -AccountPass
 # ============== CONFIGURE PRIV ESC FOR HIGH PRIV USER ==============
 # Allow HighPriv user to add new members to Account Operators
 ### --- 1) Allow maja.lindgren to modify Account Operators membership ---
-$UserAcct = New-Object System.Security.Principal.NTAccount("hack.lu",$HighPrivSAM)
-$group   = Get-ADGroup "Kontoansvariga"     # CAREFUL, CHANGED FOR SWEDISH IMAGE: "Account Operators" in Swedish
-$acl     = Get-Acl "AD:$($group.DistinguishedName)"
-$memberGuid = [GUID]"bf9679c0-0de6-11d0-a285-00aa003049e2"   # 'member' attribute
-$rule    = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
-    $UserAcct,
-    [System.DirectoryServices.ActiveDirectoryRights]::WriteProperty,
-    [System.Security.AccessControl.AccessControlType]::Allow,
-    $memberGuid
+$GroupSID = 'S-1-5-32-548'              # Account Operators
+$User = 'maja.lindgren'                 # Delegated user
+$Group = Get-ADGroup -Identity $GroupSID
+$Acl = Get-ACL "AD:\$($Group.DistinguishedName)"
+
+$Guid = [GUID]"bf9679c0-0de6-11d0-a285-00aa003049e2"  # 'member' attribute
+$Rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
+    (New-Object System.Security.Principal.NTAccount($User)),
+    "WriteProperty",
+    "Allow",
+    $Guid
 )
-$acl.AddAccessRule($rule)
-Set-Acl -Path "AD:$($group.DistinguishedName)" -AclObject $acl
+
+$Acl.AddAccessRule($Rule)
+Set-ACL -Path "AD:\$($Group.DistinguishedName)" -AclObject $Acl
 
 ### --- 2) Allow Account Operators to reset DC01 password ---
 $dc = Get-ADComputer "DC01"
