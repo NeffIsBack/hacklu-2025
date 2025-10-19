@@ -59,7 +59,7 @@ This already provides valuable information. We can see the build version `26100`
 
 NetExec will automatically generate the entry for you with the `--generate-hosts-file` option. Run the following command to generate the hosts file and then add the line to your `/etc/hosts` file:
 ```bash
-nxc smb <ip> --generate-hosts-file
+nxc smb <ip> --generate-hosts-file hosts.txt
 ```
 If you have configured this correctly, you should be able to use the fully qualified domain name (FQDN) `dc01.hack.lu` to connect to the domain controller:
 
