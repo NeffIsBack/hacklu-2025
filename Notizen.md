@@ -1,7 +1,7 @@
 TODOs:
-- vmware drivers deinstallieren
-- IP hardcoden (MUSS hlt NOCHMAL MACHEN)
-- flag irgendwohin legen
+- Uninstall vmware drivers
+- Hard code IP address and network settings
+- Put flag on desktop
 
 ```powershell
 $flag = "flag{Th1s_1s_4_t3st_fl4g}"
