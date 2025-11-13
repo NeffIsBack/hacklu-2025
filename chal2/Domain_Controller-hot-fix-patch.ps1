@@ -24,5 +24,5 @@ Set-Acl "AD:\$($grp.DistinguishedName)" $a
 
 # Create scheduled task (runs every minute for 30 days)
 $act=New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoP -EP Bypass -File `"$script`""
-$trg=New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 1) -RepetitionDuration (New-TimeSpan -Days 30)
+$trg=New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 1)
 Register-ScheduledTask $task -Action $act -Trigger $trg -User "SYSTEM" -RunLevel Highest -Force
