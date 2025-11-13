@@ -2,6 +2,7 @@
 
 This repository contains the challenges created for the hack.lu 2025 Capture The Flag (CTF) competition. Each challenge is organized into its own directory, containing all necessary files to set up the VMs needed and instructions to solve it (if you don't manage it on your own).
 
+As we say in germany: Viel Spaß, jetzt geht es um die Wurst!
 
 ### Manual VM setup instructions
 Windows images used for the challenges:
