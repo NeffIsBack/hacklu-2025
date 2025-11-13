@@ -199,3 +199,5 @@ If you want to learn more about Active Directory security, here are some resourc
 - [Certipy](https://github.com/ly4k/Certipy): Analyze and exploit the Active Directory Certificate Services (AD CS).
 - [Responder](https://github.com/lgandx/Responder): Poisoning tool for LLMNR, NBT-NS and MDNS to capture credentials in the network.
 - [ntlmrelayx.py](https://github.com/SecureAuthCorp/impacket/tree/master/examples/ntlmrelayx.py): The most popular tool for relaying attacks on Active Directory.
+
+© 2025 Alexander Neff
