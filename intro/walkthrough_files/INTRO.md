@@ -177,7 +177,7 @@ secretsdump.py <domain>/<username>:<password>@<ip>
 
 <img src="assets/secretsdump.png" alt="Dumping the NTDS.dit" width="1140"/>
 
-The format of each NTDS.dit secret is `<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the user's unique relative identifier within the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual password hash and can be used in pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
+The format of each NTDS.dit secret is `<username>:<RID>:<LM hash>:<NT hash>:<username>:::`. The RID is the user's unique relative identifier within the domain. The LM hash is a legacy hash format that is nowadays mostly unused and will default to the empty hash. The NT hash is the actual password hash and can be used in pass-the-hash attacks or to crack the password. In Active Directory, the NT hash is nearly equivalent to the actual password, as it can be used for most authentication methods.
 
 ### 7. Logging in as Domain Admin
 Now that we have the NT hash of the Domain Admin, we can use it to authenticate as this user. This can be done with either the NTLM (pass-the-hash) or Kerberos (pass-the-key) protocol. Let's use NetExec to authenticate via NTLM (default method):
